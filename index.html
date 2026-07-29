@@ -162,7 +162,6 @@
   }
   .page-date{ font-size:.75rem; color: #a5334a; font-family:'Work Sans'; letter-spacing:.08em; margin-top:.4rem; font-weight:500;}
   
-  /* Bouton supprimer page (accessible à tous maintenant) */
   .page-del{ position:absolute; top:1rem; right:1rem; background:rgba(255,255,255,.9); border:1px solid #d4c4b7; color: #a5334a; font-size:.65rem; padding:.3rem .6rem; border-radius:12px; cursor:pointer; z-index:10; font-family:'Work Sans'; }
   .page-del:hover { background: #fff; border-color: #a5334a; }
   
@@ -176,7 +175,6 @@
   .sommaire-btn { width: auto; padding: 0 1.2rem; border-radius: 24px; font-size: 0.85rem; font-family: 'Work Sans'; letter-spacing: 0.05em; text-transform: uppercase; }
   .page-indicator{ font-size:.8rem; color:var(--rose-dust); letter-spacing:.1em; text-align:center; margin-top:0.8rem;}
   
-  /* Bouton ajouter page (accessible à tous maintenant) */
   .add-page-btn{
     margin-top:1.4rem; background:none; border:1px dashed var(--gold); color:var(--gold-soft);
     padding:.6rem 1.4rem; border-radius:24px; cursor:pointer; font-family:'Work Sans'; font-size:.85rem;
@@ -206,7 +204,6 @@
   .popup-photo{ width:100%; max-width:220px; border-radius:6px; margin-bottom:.4rem; display:block; }
   .popup-text{ font-size:.85rem; line-height:1.5; margin:0; }
   
-  /* Bouton supprimer map pin (accessible à tous) */
   .popup-del{ margin-top:.5rem; background:none; border:1px solid var(--line); color:var(--rose-dust); font-size:.7rem; padding:.2rem .6rem; border-radius:12px; cursor:pointer; }
 
   /* ---------- MODAL ---------- */
@@ -234,10 +231,29 @@
   .btn-solid{ background:var(--bordeaux); border:none; color:var(--cream); padding:.5rem 1.2rem; border-radius:6px; cursor:pointer; }
   .btn-solid:hover{ background:var(--bordeaux-bright); }
 
-  footer{ text-align:center; padding:1rem 1.5rem 2rem; color:var(--rose-dust); font-size:.8rem; letter-spacing:.05em; }
+  /* ---------- FOOTER ET LETTRE D'AMOUR ---------- */
+  footer{ text-align:center; padding:1rem 1.5rem 2rem; color:var(--rose-dust); font-size:.8rem; letter-spacing:.05em; position: relative;}
   footer .serif{ font-size:1.4rem; color:var(--gold-soft); display:block; margin-bottom:.6rem; }
   .divider{ width:60px; height:1px; background:var(--gold); opacity:.5; margin:0 auto 2.5rem; }
   .lock-error { color:var(--rose-dust); font-size:.8rem; margin-top:.8rem; min-height:1rem; }
+  
+  .love-letter-wrap {
+    margin-top: 3rem;
+    margin-bottom: 2rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+  .love-letter-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    line-height: 1.8;
+    color: var(--cream);
+    white-space: pre-wrap; /* Garde les retours à la ligne ! */
+    font-style: italic;
+  }
+
 </style>
 </head>
 <body>
@@ -247,7 +263,6 @@
   <h1 id="heroTitle">Bon anniversaire, mon amour</h1>
   <div class="names" id="heroSub">19 ans d'elle, et notre histoire qui continue</div>
   
-  <!-- Bouton modifier texte : caché par défaut, visible en admin -->
   <div class="hero-edit-row admin-only admin-block">
     <button class="edit-btn" onclick="editHero()">modifier le texte</button>
   </div>
@@ -256,7 +271,6 @@
     <div class="countdown-label" id="cdLabel">avant nos prochaines retrouvailles</div>
     <div class="countdown" id="countdown"></div>
     
-    <!-- Bouton modifier compte à rebours : caché par défaut -->
     <button class="edit-btn admin-only admin-inline" onclick="toggleCdEdit()">modifier la date</button>
     <div class="countdown-edit admin-only admin-flex" id="cdEditRow" style="display:none !important;">
       <input type="datetime-local" id="cdInput">
@@ -280,7 +294,6 @@
     </div>
     <div class="page-indicator" id="pageIndicator"></div>
     
-    <!-- Bouton ajouter souvenir : visible par tous -->
     <button class="add-page-btn" onclick="openPageModal()">+ ajouter un souvenir</button>
   </div>
 </div>
@@ -291,13 +304,24 @@
   <h2 class="section-title">La carte de nos retrouvailles</h2>
   <div id="map"></div>
   
-  <!-- Indication map : visible par tous -->
   <div class="map-hint">Cliquez n'importe où sur la carte pour ajouter un lieu, une date et une anecdote.</div>
 </div>
 
 <footer>
-  <span class="serif">À nous, à tout ce qui vient encore.</span>
-  Fait avec amour, pour tes 19 ans.
+  <span class="serif" id="footerText1">À nous, à tout ce qui vient encore.</span>
+  <span id="footerText2">Fait avec amour, pour tes 19 ans.</span>
+  
+  <div class="admin-only admin-block" style="margin-top: 1rem;">
+    <button class="edit-btn" onclick="editFooter()">modifier le texte de fin</button>
+  </div>
+
+  <!-- SECTION LETTRE D'AMOUR -->
+  <div class="love-letter-wrap">
+    <div id="loveLetterDisplay" class="love-letter-text"></div>
+    <div class="admin-only admin-block" style="margin-top: 1rem;">
+      <button class="edit-btn" onclick="openLetterModal()">modifier la lettre d'amour longue</button>
+    </div>
+  </div>
 </footer>
 
 <!-- SECTION ADMIN SECRÈTE EN BAS -->
@@ -313,7 +337,7 @@
   
   <div id="adminPanel" style="display:none; text-align:center; color:var(--gold-soft); font-size:0.85rem; padding: 1rem; border: 1px dashed var(--line); border-radius: 8px;">
     ✓ <b>Mode Administrateur activé.</b><br>
-    Tu peux maintenant modifier les textes principaux et la date du compte à rebours (les boutons sont apparus plus haut).
+    Tu peux maintenant modifier tous les textes (titres, dates, pied de page, lettre d'amour). Les boutons sont apparus sur le site.
   </div>
 </div>
 
@@ -386,6 +410,21 @@
   </div>
 </div>
 
+<!-- MODAL LETTRE D'AMOUR -->
+<div class="modal-overlay" id="letterModal">
+  <div class="modal" style="max-width: 600px;">
+    <h3>Ta lettre d'amour</h3>
+    <div class="field">
+      <label>Ton texte long (les retours à la ligne seront conservés)</label>
+      <textarea id="letterInput" placeholder="Écris ici..." style="min-height: 250px;"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeModal('letterModal')">annuler</button>
+      <button class="btn-solid" onclick="saveLetter()">enregistrer</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODULE FIREBASE -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
@@ -422,6 +461,29 @@
     }
   });
 
+  // Écouteurs pour le Footer
+  onValue(ref(db, 'site_data/footer-1'), (snapshot) => {
+    if(snapshot.exists()) {
+      window.footerText1 = snapshot.val();
+      document.getElementById('footerText1').textContent = window.footerText1;
+    }
+  });
+  
+  onValue(ref(db, 'site_data/footer-2'), (snapshot) => {
+    if(snapshot.exists()) {
+      window.footerText2 = snapshot.val();
+      document.getElementById('footerText2').textContent = window.footerText2;
+    }
+  });
+
+  // Écouteur pour la lettre d'amour
+  onValue(ref(db, 'site_data/love-letter'), (snapshot) => {
+    if(snapshot.exists()) {
+      window.loveLetterText = snapshot.val();
+      document.getElementById('loveLetterDisplay').textContent = window.loveLetterText;
+    }
+  });
+
   onValue(ref(db, 'site_data/countdown-date'), (snapshot) => {
     if(snapshot.exists()) {
       window.countdownDate = snapshot.val();
@@ -452,6 +514,9 @@
   window.isAdmin = false;
   window.heroTitle = "Bon anniversaire, mon amour";
   window.heroSub = "19 ans d'elle, et notre histoire qui continue";
+  window.footerText1 = "À nous, à tout ce qui vient encore.";
+  window.footerText2 = "Fait avec amour, pour tes 19 ans.";
+  window.loveLetterText = "";
   window.countdownDate = new Date(new Date().getTime() + 14*24*60*60*1000).toISOString();
   window.pages = [];
   window.pins = [];
@@ -506,6 +571,25 @@
       window.firebaseSet('hero-title', t);
       window.firebaseSet('hero-sub', s);
     }
+  }
+
+  function editFooter(){
+    const f1 = prompt('Première phrase de fin (en grand) :', window.footerText1);
+    if(f1!==null && window.firebaseSet) window.firebaseSet('footer-1', f1);
+    
+    const f2 = prompt('Deuxième phrase de fin (en petit) :', window.footerText2);
+    if(f2!==null && window.firebaseSet) window.firebaseSet('footer-2', f2);
+  }
+
+  function openLetterModal(){
+    document.getElementById('letterInput').value = window.loveLetterText || "";
+    document.getElementById('letterModal').classList.add('open');
+  }
+
+  function saveLetter(){
+    const txt = document.getElementById('letterInput').value;
+    if(window.firebaseSet) window.firebaseSet('love-letter', txt);
+    closeModal('letterModal');
   }
 
   function toggleCdEdit(){
@@ -684,7 +768,6 @@
     window.markersLayer = L.layerGroup().addTo(window.map);
     
     window.map.on('click', (e)=>{
-      // Plus de restriction admin ici ! Tout le monde peut ajouter.
       window.pendingLatLng = e.latlng;
       document.getElementById('pinTitle').value = '';
       document.getElementById('pinDate').value = '';
