@@ -42,21 +42,11 @@
   }
   ::selection{ background:var(--bordeaux-bright); color:var(--cream); }
 
-  /* ---------- LOCK SCREEN ---------- */
-  #lockScreen{
-    position:fixed; inset:0; z-index:2000; background:var(--bg-deep);
-    display:flex; align-items:center; justify-content:center; flex-direction:column;
-    text-align:center; padding:2rem;
-  }
-  #lockScreen.hidden{ display:none; }
-  .lock-orn{ font-size:1.4rem; color:var(--gold); letter-spacing:.4em; margin-bottom:1.4rem; }
-  .lock-title{ font-size:1.8rem; color:var(--gold-soft); margin:0 0 1.6rem; }
-  .lock-row{ display:flex; gap:.6rem; align-items:center; }
-  .lock-row input{
-    background:var(--bg-panel); border:1px solid var(--line); color:var(--cream);
-    padding:.6rem .8rem; border-radius:6px; font-family:'Work Sans'; font-size:.95rem; width:220px;
-  }
-  .lock-error{ color:var(--rose-dust); font-size:.8rem; margin-top:.8rem; min-height:1rem; }
+  /* ---------- SYSTEME ADMIN CACHE ---------- */
+  .admin-only { display: none !important; }
+  body.admin-mode .admin-inline { display: inline-block !important; }
+  body.admin-mode .admin-block { display: block !important; }
+  body.admin-mode .admin-flex { display: flex !important; }
 
   /* ---------- HERO ---------- */
   .hero{
@@ -76,6 +66,7 @@
   .hero .names{
     font-style:italic; color:var(--gold-soft); font-size:clamp(1.1rem,3vw,1.5rem); margin-top:1rem;
   }
+  .hero-edit-row { margin-top: 1rem; }
 
   /* Countdown CSS */
   .countdown-wrap{ margin-top:4rem; }
@@ -93,7 +84,7 @@
     cursor:pointer; opacity:.7; transition:.2s; letter-spacing:.05em; margin-top: 1.2rem;
   }
   .edit-btn:hover{ opacity:1; border-color:var(--gold); background:rgba(201,166,104,.08); }
-  .countdown-edit{ display:flex; gap:.6rem; justify-content:center; align-items:center; flex-wrap:wrap; margin-top:0.8rem; }
+  .countdown-edit{ gap:.6rem; justify-content:center; align-items:center; flex-wrap:wrap; margin-top:0.8rem; }
   .countdown-edit input[type=datetime-local]{
     background:var(--bg-panel); border:1px solid var(--line); color:var(--cream);
     padding:.4rem .6rem; border-radius:6px; font-family:'Work Sans'; font-size:.85rem;
@@ -109,40 +100,75 @@
   .book-stage{ display:flex; flex-direction:column; align-items:center; }
   .book{
     position:relative; width:min(100%, 640px); aspect-ratio:4/3;
-    perspective:1800px;
+    perspective: 1500px; /* Perspective pour la 3D */
   }
-  /* Style spécifique du livre physique */
-  .page{
+  
+  .page {
     position:absolute; inset:0; 
-    background: #fdfaf6; /* Couleur de texture papier crème */
-    border: 1px solid #d4c4b7;
-    border-radius: 4px 16px 16px 4px; /* Reliure à gauche, coins arrondis à droite */
+    border-radius: 4px 16px 16px 4px;
     overflow:hidden;
     display:flex; flex-direction:column; 
-    box-shadow: inset 12px 0 20px -10px rgba(0,0,0,0.15), 0 20px 40px rgba(0,0,0,0.4); /* Ombre de reliure + ombre portée */
     backface-visibility:hidden;
+    transform-origin: left center; /* Point de pivot à gauche (la reliure) */
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
   }
-  /* Ligne de reliure intérieure */
-  .page::before {
-    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 25px;
-    background: linear-gradient(to right, rgba(0,0,0,0.08), transparent);
+
+  /* Style page intérieure (Papier) */
+  .page.paper-page {
+    background: linear-gradient(to right, #eaddcf 0%, #fdfaf6 6%, #fdfaf6 96%, #eaddcf 100%);
+    border: 1px solid #d4c4b7;
+    box-shadow: inset 10px 0 20px rgba(0,0,0,0.1), 0 15px 35px rgba(0,0,0,0.4);
+  }
+  .page.paper-page::before { /* Ligne de reliure intérieure */
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 30px;
+    background: linear-gradient(to right, rgba(0,0,0,0.12), transparent);
     z-index: 2; pointer-events: none;
   }
-  .page-photo{ flex:1; padding: 1.5rem 1.5rem 0.5rem 2.8rem; position:relative; overflow:hidden; }
+
+  /* Style de la Couverture */
+  .page.cover-page {
+    background: var(--bg-panel-2);
+    border: 2px solid var(--gold);
+    box-shadow: inset 8px 0 20px rgba(0,0,0,0.4), 0 15px 35px rgba(0,0,0,0.5);
+    display: flex; align-items: center; justify-content: center; flex-direction: column;
+    background-image: radial-gradient(circle, transparent 20%, rgba(0,0,0,0.4) 120%), linear-gradient(to right, rgba(0,0,0,0.5) 0%, transparent 10%);
+  }
+  .cover-page h2 {
+    font-family: 'Cormorant Garamond', serif; font-size: clamp(2.5rem, 5vw, 4rem);
+    color: var(--gold); margin: 0; text-align: center; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  }
+  .cover-ornament { font-size: 2rem; color: var(--gold); text-align: center; margin-bottom: 1rem; }
+
+  /* Animations de rotation de page (3D) */
+  .turning-next .page { transform: rotateY(-90deg); opacity: 0.5; }
+  .turning-enter-next .page { animation: fadeInNext 0.5s ease-out forwards; }
+  @keyframes fadeInNext {
+    0% { opacity: 0; transform: scale(0.98); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+  .turning-prev .page { opacity: 0; transform: scale(0.98); }
+  .turning-enter-prev .page { animation: swingInPrev 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+  @keyframes swingInPrev {
+    0% { transform: rotateY(-90deg); opacity: 0.5; }
+    100% { transform: rotateY(0deg); opacity: 1; }
+  }
+
+  /* Contenu de la page */
+  .page-photo{ flex:1; padding: 1.5rem 1.5rem 0.5rem 3.2rem; position:relative; overflow:hidden; }
   .page-photo img{ width:100%; height:100%; object-fit:cover; display:block; border-radius:4px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
   .page-empty{
     display:flex; align-items:center; justify-content:center; height:100%; flex-direction:column; gap:.8rem;
-    text-align:center; padding:1.5rem 1.5rem 1.5rem 2.8rem;
+    text-align:center; padding:1.5rem 1.5rem 1.5rem 3.2rem;
   }
   .page-caption{
-    padding:1rem 1.5rem 1.5rem 2.8rem; font-family:'Cormorant Garamond'; font-style:italic; font-size:1.3rem;
+    padding:1rem 1.5rem 1.5rem 3.2rem; font-family:'Cormorant Garamond'; font-style:italic; font-size:1.3rem;
     color: #2b1b17; min-height:4rem; text-align: center;
   }
   .page-date{ font-size:.75rem; color: #a5334a; font-family:'Work Sans'; letter-spacing:.08em; margin-top:.4rem; font-weight:500;}
   .page-del{ position:absolute; top:1rem; right:1rem; background:rgba(255,255,255,.9); border:1px solid #d4c4b7; color: #a5334a; font-size:.65rem; padding:.3rem .6rem; border-radius:12px; cursor:pointer; z-index:10; font-family:'Work Sans'; }
   .page-del:hover { background: #fff; border-color: #a5334a; }
   
-  .book-nav{ display:flex; align-items:center; gap:1.2rem; margin-top:2rem; justify-content: center;}
+  .book-nav{ display:flex; align-items:center; gap:1.2rem; margin-top:2.5rem; justify-content: center;}
   .nav-btn{
     background:var(--bg-panel); border:1px solid var(--line); color:var(--gold-soft);
     width:42px; height:42px; border-radius:50%; cursor:pointer; font-size:1.1rem; display:flex; align-items:center; justify-content:center; transition: 0.2s;
@@ -159,38 +185,13 @@
   .add-page-btn:hover{ background:rgba(201,166,104,.08); }
 
   /* ---------- SOMMAIRE MODAL ---------- */
-  .sommaire-list {
-    max-height: 50vh;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-top: 1rem;
-  }
+  .sommaire-list { max-height: 50vh; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem; }
   .sommaire-item {
-    background: var(--bg-panel-2);
-    padding: 0.8rem 1rem;
-    border-radius: 6px;
-    cursor: pointer;
-    border: 1px solid transparent;
-    transition: 0.2s;
-    text-align: left;
+    background: var(--bg-panel-2); padding: 0.8rem 1rem; border-radius: 6px; cursor: pointer; border: 1px solid transparent; transition: 0.2s; text-align: left;
   }
   .sommaire-item:hover { border-color: var(--gold); }
-  .sommaire-item-date {
-    color: var(--gold-soft);
-    font-weight: 500;
-    font-size: 0.95rem;
-    margin-bottom: 0.2rem;
-  }
-  .sommaire-item-caption {
-    font-size: 0.8rem;
-    color: var(--cream);
-    opacity: 0.8;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+  .sommaire-item-date { color: var(--gold-soft); font-weight: 500; font-size: 0.95rem; margin-bottom: 0.2rem; }
+  .sommaire-item-caption { font-size: 0.8rem; color: var(--cream); opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
   /* ---------- MAP ---------- */
   #map{
@@ -231,33 +232,31 @@
   .btn-solid{ background:var(--bordeaux); border:none; color:var(--cream); padding:.5rem 1.2rem; border-radius:6px; cursor:pointer; }
   .btn-solid:hover{ background:var(--bordeaux-bright); }
 
-  footer{ text-align:center; padding:3rem 1.5rem 4rem; color:var(--rose-dust); font-size:.8rem; letter-spacing:.05em; }
+  footer{ text-align:center; padding:1rem 1.5rem 2rem; color:var(--rose-dust); font-size:.8rem; letter-spacing:.05em; }
   footer .serif{ font-size:1.4rem; color:var(--gold-soft); display:block; margin-bottom:.6rem; }
   .divider{ width:60px; height:1px; background:var(--gold); opacity:.5; margin:0 auto 2.5rem; }
+  .lock-error { color:var(--rose-dust); font-size:.8rem; margin-top:.8rem; min-height:1rem; }
 </style>
 </head>
 <body>
-
-<div id="lockScreen">
-  <div class="lock-orn">✦</div>
-  <h2 class="lock-title">Un mot de passe pour entrer</h2>
-  <div class="lock-row">
-    <input type="password" id="lockInput" placeholder="mot de passe" onkeydown="if(event.key==='Enter')tryUnlock()">
-    <button class="save-mini" onclick="tryUnlock()">entrer</button>
-  </div>
-  <div class="lock-error" id="lockError"></div>
-</div>
 
 <div class="hero">
   <div class="hero-orn">✦</div>
   <h1 id="heroTitle">Bon anniversaire, mon amour</h1>
   <div class="names" id="heroSub">19 ans d'elle, et notre histoire qui continue</div>
+  
+  <!-- Bouton modifier texte : caché par défaut, visible en admin -->
+  <div class="hero-edit-row admin-only admin-block">
+    <button class="edit-btn" onclick="editHero()">modifier le texte</button>
+  </div>
 
   <div class="countdown-wrap">
     <div class="countdown-label" id="cdLabel">avant nos prochaines retrouvailles</div>
     <div class="countdown" id="countdown"></div>
-    <button class="edit-btn" onclick="toggleCdEdit()">modifier la date</button>
-    <div class="countdown-edit" id="cdEditRow" style="display:none;">
+    
+    <!-- Bouton modifier compte à rebours : caché par défaut -->
+    <button class="edit-btn admin-only admin-inline" onclick="toggleCdEdit()">modifier la date</button>
+    <div class="countdown-edit admin-only admin-flex" id="cdEditRow" style="display:none !important;">
       <input type="datetime-local" id="cdInput">
       <button class="save-mini" onclick="saveCountdown()">enregistrer</button>
     </div>
@@ -269,6 +268,7 @@
   <div class="eyebrow">notre livre</div>
   <h2 class="section-title">Nos souvenirs, page après page</h2>
   <div class="book-stage">
+    
     <div class="book" id="bookEl"></div>
     
     <div class="book-nav">
@@ -278,7 +278,8 @@
     </div>
     <div class="page-indicator" id="pageIndicator"></div>
     
-    <button class="add-page-btn" onclick="openPageModal()">+ ajouter un souvenir</button>
+    <!-- Bouton ajouter souvenir : caché par défaut -->
+    <button class="add-page-btn admin-only admin-inline" onclick="openPageModal()">+ ajouter un souvenir</button>
   </div>
 </div>
 
@@ -287,13 +288,32 @@
   <div class="eyebrow">notre carte</div>
   <h2 class="section-title">La carte de nos retrouvailles</h2>
   <div id="map"></div>
-  <div class="map-hint">Cliquez n'importe où sur la carte pour ajouter un lieu, une date et une anecdote.</div>
+  
+  <!-- Indication map admin -->
+  <div class="map-hint admin-only admin-block">Mode admin activé : Cliquez n'importe où sur la carte pour ajouter un lieu.</div>
 </div>
 
 <footer>
   <span class="serif">À nous, à tout ce qui vient encore.</span>
   Fait avec amour, pour tes 19 ans.
 </footer>
+
+<!-- SECTION ADMIN SECRÈTE EN BAS -->
+<div class="section" style="padding-top: 0; padding-bottom: 4rem;">
+  <div class="divider" style="margin-bottom: 1.5rem;"></div>
+  <div class="eyebrow">Accès Réservé</div>
+  
+  <div id="adminLogin" style="text-align:center; margin-top:1rem;">
+    <input type="password" id="adminPwd" placeholder="Mot de passe" style="background:var(--bg-panel); border:1px solid var(--line); color:var(--cream); padding:.5rem .8rem; border-radius:6px; font-family:'Work Sans'; width:200px; margin-right:0.5rem; margin-bottom:0.5rem;">
+    <button class="save-mini" onclick="unlockAdmin()">Mode Édition</button>
+    <div id="adminError" class="lock-error"></div>
+  </div>
+  
+  <div id="adminPanel" style="display:none; text-align:center; color:var(--gold-soft); font-size:0.85rem; padding: 1rem; border: 1px dashed var(--line); border-radius: 8px;">
+    ✓ <b>Mode Administrateur activé.</b><br>
+    Tu peux maintenant modifier les textes, la date, et ajouter/supprimer des souvenirs et lieux (les boutons sont apparus plus haut).
+  </div>
+</div>
 
 <div class="modal-overlay" id="sommaireModal">
   <div class="modal">
@@ -386,6 +406,20 @@
     set(ref(db, 'site_data/' + key), value);
   };
 
+  onValue(ref(db, 'site_data/hero-title'), (snapshot) => {
+    if(snapshot.exists()) {
+      window.heroTitle = snapshot.val();
+      document.getElementById('heroTitle').textContent = window.heroTitle;
+    }
+  });
+
+  onValue(ref(db, 'site_data/hero-sub'), (snapshot) => {
+    if(snapshot.exists()) {
+      window.heroSub = snapshot.val();
+      document.getElementById('heroSub').textContent = window.heroSub;
+    }
+  });
+
   onValue(ref(db, 'site_data/countdown-date'), (snapshot) => {
     if(snapshot.exists()) {
       window.countdownDate = snapshot.val();
@@ -410,22 +444,29 @@
 
 <!-- SCRIPT DU SITE -->
 <script>
-  const SITE_PASSWORD = "notrehistoire";
+  // MOT DE PASSE POUR AFFICHER LES BOUTONS ADMIN
+  const ADMIN_PASSWORD = "notrehistoire";
 
+  window.isAdmin = false;
+  window.heroTitle = "Bon anniversaire, mon amour";
+  window.heroSub = "19 ans d'elle, et notre histoire qui continue";
   window.countdownDate = new Date(new Date().getTime() + 14*24*60*60*1000).toISOString();
   window.pages = [];
   window.pins = [];
-  window.currentPage = 0;
+  window.currentPage = -1; // -1 correspond à la couverture
   window.pendingLatLng = null;
   window.map = null;
   window.markersLayer = null;
 
-  function tryUnlock(){
-    const v = document.getElementById('lockInput').value;
-    if(v === SITE_PASSWORD){
-      document.getElementById('lockScreen').classList.add('hidden');
+  function unlockAdmin(){
+    const pwd = document.getElementById('adminPwd').value;
+    if(pwd === ADMIN_PASSWORD){
+      window.isAdmin = true;
+      document.body.classList.add('admin-mode');
+      document.getElementById('adminLogin').style.display = 'none';
+      document.getElementById('adminPanel').style.display = 'block';
     } else {
-      document.getElementById('lockError').textContent = "Mot de passe incorrect.";
+      document.getElementById('adminError').textContent = "Mot de passe incorrect.";
     }
   }
 
@@ -454,11 +495,22 @@
     return dt.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
   }
 
+  function editHero(){
+    const t = prompt('Titre principal :', window.heroTitle);
+    if(t===null) return;
+    const s = prompt('Sous-titre :', window.heroSub);
+    if(s===null) return;
+    if(window.firebaseSet) {
+      window.firebaseSet('hero-title', t);
+      window.firebaseSet('hero-sub', s);
+    }
+  }
+
   function toggleCdEdit(){
     const row = document.getElementById('cdEditRow');
-    const open = row.style.display !== 'none';
-    row.style.display = open ? 'none' : 'flex';
-    if(!open){
+    const isHidden = row.style.display.includes('none');
+    row.style.setProperty('display', isHidden ? 'flex' : 'none', 'important');
+    if(isHidden){
       const d = new Date(window.countdownDate);
       const pad = n=>String(n).padStart(2,'0');
       document.getElementById('cdInput').value = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
@@ -470,7 +522,7 @@
     if(!v) return;
     const newDate = new Date(v).toISOString();
     if(window.firebaseSet) window.firebaseSet('countdown-date', newDate);
-    document.getElementById('cdEditRow').style.display = 'none';
+    document.getElementById('cdEditRow').style.setProperty('display', 'none', 'important');
   }
 
   window.renderCountdown = function(){
@@ -504,32 +556,65 @@
     if(!book) return;
     book.innerHTML = '';
     
-    // 1. Trier les pages par ordre chronologique
     window.pages.sort((a,b) => new Date(a.date||0) - new Date(b.date||0));
     
-    if(window.pages.length === 0){
-      book.innerHTML = `<div class="page"><div class="page-empty">
-        <div class="serif" style="font-size:1.6rem;color:#7a1f2b">Votre histoire commence ici</div>
-        <div style="font-size:0.95rem; color:#555;">Ajoutez votre première photo<br>et sa petite anecdote.</div>
-      </div></div>`;
+    // Affichage de la couverture (Index -1)
+    if(window.currentPage === -1 || (window.pages.length === 0 && window.currentPage === -1)){
+      book.innerHTML = `
+        <div class="page cover-page">
+          <div class="cover-ornament">✦</div>
+          <h2>Notre histoire</h2>
+        </div>
+      `;
       document.getElementById('pageIndicator').textContent = '';
       document.getElementById('prevBtn').disabled = true;
-      document.getElementById('nextBtn').disabled = true;
+      document.getElementById('nextBtn').disabled = (window.pages.length === 0);
       return;
     }
-    if(window.currentPage >= window.pages.length) window.currentPage = Math.max(0, window.pages.length - 1);
+
+    if(window.currentPage >= window.pages.length) window.currentPage = Math.max(-1, window.pages.length - 1);
+    if(window.currentPage === -1) { window.renderBook(); return; }
     
     const p = window.pages[window.currentPage];
     const photoHtml = p.photo ? `<img src="${p.photo}">` : '';
-    book.innerHTML = `<div class="page">
-      <button class="page-del" onclick="deletePage('${p.id}')">supprimer</button>
+    
+    book.innerHTML = `<div class="page paper-page">
+      <button class="page-del admin-only admin-inline" onclick="deletePage('${p.id}')">supprimer</button>
       <div class="page-photo">${photoHtml}</div>
       <div class="page-caption">${p.caption || ''}<div class="page-date">${fmtDate(p.date)}</div></div>
     </div>`;
+    
     document.getElementById('pageIndicator').textContent = 'Page ' + (window.currentPage+1) + ' / ' + window.pages.length;
-    document.getElementById('prevBtn').disabled = window.currentPage === 0;
+    document.getElementById('prevBtn').disabled = false;
     document.getElementById('nextBtn').disabled = window.currentPage === window.pages.length - 1;
   };
+
+  // Fonction pour animer la page tournée
+  function turnPage(dir){
+    const bookContainer = document.getElementById('bookEl');
+    
+    // Lancement de l'animation de sortie
+    if(dir > 0) bookContainer.classList.add('turning-next');
+    else bookContainer.classList.add('turning-prev');
+
+    // Changement de la page pendant qu'elle est cachée
+    setTimeout(() => {
+      window.currentPage += dir;
+      if(window.currentPage < -1) window.currentPage = -1;
+      if(window.currentPage > window.pages.length-1) window.currentPage = window.pages.length-1;
+      
+      window.renderBook();
+      
+      bookContainer.classList.remove('turning-next', 'turning-prev');
+      bookContainer.classList.add(dir > 0 ? 'turning-enter-next' : 'turning-enter-prev');
+      
+      // Nettoyage après l'animation d'entrée
+      setTimeout(() => {
+        bookContainer.classList.remove('turning-enter-next', 'turning-enter-prev');
+      }, 500);
+      
+    }, 400); // Correspond à la durée de l'animation CSS
+  }
 
   window.openSommaire = function() {
     const list = document.getElementById('sommaireList');
@@ -546,21 +631,19 @@
           <div class="sommaire-item-caption">${p.caption || 'Un beau souvenir...'}</div>
         `;
         item.onclick = () => {
-          window.currentPage = index;
-          window.renderBook();
+          // Transition douce depuis la couverture
+          if (window.currentPage === -1) {
+            turnPage(index + 1);
+          } else {
+            window.currentPage = index;
+            window.renderBook();
+          }
           closeModal('sommaireModal');
         };
         list.appendChild(item);
       });
     }
     document.getElementById('sommaireModal').classList.add('open');
-  }
-
-  function turnPage(dir){
-    window.currentPage += dir;
-    if(window.currentPage < 0) window.currentPage = 0;
-    if(window.currentPage > window.pages.length-1) window.currentPage = window.pages.length-1;
-    window.renderBook();
   }
 
   function openPageModal(){
@@ -582,10 +665,9 @@
     else if(file) { photo = await resizeImage(file, 900); }
     
     const id = 'p' + Date.now();
-    // On ajoute la page puis on laisse renderBook() faire le tri
     window.pages.push({id, date, caption, photo});
     
-    // Pour que l'utilisateur soit emmené à la bonne page après le tri
+    // On trie après ajout et on pointe sur la bonne page
     window.pages.sort((a,b) => new Date(a.date||0) - new Date(b.date||0));
     window.currentPage = window.pages.findIndex(p => p.id === id);
     
@@ -607,6 +689,7 @@
     window.markersLayer = L.layerGroup().addTo(window.map);
     
     window.map.on('click', (e)=>{
+      if(!window.isAdmin) return; // Bloque l'ajout si non admin
       window.pendingLatLng = e.latlng;
       document.getElementById('pinTitle').value = '';
       document.getElementById('pinDate').value = '';
@@ -640,7 +723,7 @@
         <div class="popup-date">${fmtDate(p.date)}</div>
         ${photoHtml}
         <p class="popup-text">${p.text||''}</p>
-        <button class="popup-del" onclick="deletePin('${p.id}')">supprimer</button>
+        <button class="popup-del admin-only admin-inline" onclick="deletePin('${p.id}')">supprimer</button>
       </div>`;
       L.marker([p.lat,p.lng], {icon:goldIcon()}).addTo(window.markersLayer).bindPopup(html);
     });
