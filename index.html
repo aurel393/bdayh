@@ -76,15 +76,9 @@
   .hero .names{
     font-style:italic; color:var(--gold-soft); font-size:clamp(1.1rem,3vw,1.5rem); margin-top:1rem;
   }
-  .edit-btn{
-    background:none; border:1px solid var(--line); color:var(--gold);
-    border-radius:20px; padding:.25rem .8rem; font-size:.7rem; font-family:'Work Sans';
-    cursor:pointer; opacity:.7; transition:.2s; letter-spacing:.05em;
-  }
-  .edit-btn:hover{ opacity:1; border-color:var(--gold); background:rgba(201,166,104,.08); }
-  .hero-edit-row{ margin-top:.8rem; }
 
-  .countdown-wrap{ margin-top:3rem; }
+  /* Countdown CSS */
+  .countdown-wrap{ margin-top:4rem; }
   .countdown-label{ font-size:.8rem; letter-spacing:.2em; text-transform:uppercase; color:var(--rose-dust); margin-bottom:1rem; }
   .countdown{ display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; }
   .cd-box{
@@ -93,7 +87,13 @@
   }
   .cd-num{ font-size:2.2rem; font-weight:500; color:var(--gold-soft); font-family:'Cormorant Garamond'; }
   .cd-unit{ font-size:.65rem; letter-spacing:.15em; text-transform:uppercase; color:var(--rose-dust); margin-top:.2rem; }
-  .countdown-edit{ margin-top:1.2rem; display:flex; gap:.6rem; justify-content:center; align-items:center; flex-wrap:wrap; }
+  .edit-btn{
+    background:none; border:1px solid var(--line); color:var(--gold);
+    border-radius:20px; padding:.25rem .8rem; font-size:.7rem; font-family:'Work Sans';
+    cursor:pointer; opacity:.7; transition:.2s; letter-spacing:.05em; margin-top: 1.2rem;
+  }
+  .edit-btn:hover{ opacity:1; border-color:var(--gold); background:rgba(201,166,104,.08); }
+  .countdown-edit{ display:flex; gap:.6rem; justify-content:center; align-items:center; flex-wrap:wrap; margin-top:0.8rem; }
   .countdown-edit input[type=datetime-local]{
     background:var(--bg-panel); border:1px solid var(--line); color:var(--cream);
     padding:.4rem .6rem; border-radius:6px; font-family:'Work Sans'; font-size:.85rem;
@@ -111,38 +111,86 @@
     position:relative; width:min(100%, 640px); aspect-ratio:4/3;
     perspective:1800px;
   }
+  /* Style spécifique du livre physique */
   .page{
-    position:absolute; inset:0; background:var(--bg-panel);
-    border:1px solid var(--line); border-radius:8px; overflow:hidden;
-    display:flex; flex-direction:column; box-shadow:0 20px 50px rgba(0,0,0,.5);
+    position:absolute; inset:0; 
+    background: #fdfaf6; /* Couleur de texture papier crème */
+    border: 1px solid #d4c4b7;
+    border-radius: 4px 16px 16px 4px; /* Reliure à gauche, coins arrondis à droite */
+    overflow:hidden;
+    display:flex; flex-direction:column; 
+    box-shadow: inset 12px 0 20px -10px rgba(0,0,0,0.15), 0 20px 40px rgba(0,0,0,0.4); /* Ombre de reliure + ombre portée */
     backface-visibility:hidden;
   }
-  .page-photo{ flex:1; background:var(--bg-panel-2); position:relative; overflow:hidden; }
-  .page-photo img{ width:100%; height:100%; object-fit:cover; display:block; }
+  /* Ligne de reliure intérieure */
+  .page::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 25px;
+    background: linear-gradient(to right, rgba(0,0,0,0.08), transparent);
+    z-index: 2; pointer-events: none;
+  }
+  .page-photo{ flex:1; padding: 1.5rem 1.5rem 0.5rem 2.8rem; position:relative; overflow:hidden; }
+  .page-photo img{ width:100%; height:100%; object-fit:cover; display:block; border-radius:4px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
   .page-empty{
     display:flex; align-items:center; justify-content:center; height:100%; flex-direction:column; gap:.8rem;
-    color:var(--rose-dust); text-align:center; padding:1.5rem;
+    text-align:center; padding:1.5rem 1.5rem 1.5rem 2.8rem;
   }
   .page-caption{
-    padding:.9rem 1.2rem; font-family:'Cormorant Garamond'; font-style:italic; font-size:1.1rem;
-    color:var(--gold-soft); border-top:1px solid var(--line); min-height:2.4rem;
+    padding:1rem 1.5rem 1.5rem 2.8rem; font-family:'Cormorant Garamond'; font-style:italic; font-size:1.3rem;
+    color: #2b1b17; min-height:4rem; text-align: center;
   }
-  .page-date{ font-size:.7rem; color:var(--rose-dust); font-family:'Work Sans'; letter-spacing:.08em; margin-top:.2rem;}
-  .page-del{ position:absolute; top:.6rem; right:.6rem; background:rgba(23,7,9,.6); border:1px solid var(--line); color:var(--rose-dust); font-size:.65rem; padding:.2rem .6rem; border-radius:12px; cursor:pointer; }
-  .book-nav{ display:flex; align-items:center; gap:1.5rem; margin-top:1.6rem; }
+  .page-date{ font-size:.75rem; color: #a5334a; font-family:'Work Sans'; letter-spacing:.08em; margin-top:.4rem; font-weight:500;}
+  .page-del{ position:absolute; top:1rem; right:1rem; background:rgba(255,255,255,.9); border:1px solid #d4c4b7; color: #a5334a; font-size:.65rem; padding:.3rem .6rem; border-radius:12px; cursor:pointer; z-index:10; font-family:'Work Sans'; }
+  .page-del:hover { background: #fff; border-color: #a5334a; }
+  
+  .book-nav{ display:flex; align-items:center; gap:1.2rem; margin-top:2rem; justify-content: center;}
   .nav-btn{
     background:var(--bg-panel); border:1px solid var(--line); color:var(--gold-soft);
-    width:42px; height:42px; border-radius:50%; cursor:pointer; font-size:1.1rem; display:flex; align-items:center; justify-content:center;
+    width:42px; height:42px; border-radius:50%; cursor:pointer; font-size:1.1rem; display:flex; align-items:center; justify-content:center; transition: 0.2s;
   }
   .nav-btn:hover{ border-color:var(--gold); }
   .nav-btn:disabled{ opacity:.3; cursor:default; }
-  .page-indicator{ font-size:.8rem; color:var(--rose-dust); letter-spacing:.1em; min-width:70px; text-align:center;}
+  .sommaire-btn { width: auto; padding: 0 1.2rem; border-radius: 24px; font-size: 0.85rem; font-family: 'Work Sans'; letter-spacing: 0.05em; text-transform: uppercase; }
+  .page-indicator{ font-size:.8rem; color:var(--rose-dust); letter-spacing:.1em; text-align:center; margin-top:0.8rem;}
   .add-page-btn{
     margin-top:1.4rem; background:none; border:1px dashed var(--gold); color:var(--gold-soft);
     padding:.6rem 1.4rem; border-radius:24px; cursor:pointer; font-family:'Work Sans'; font-size:.85rem;
-    letter-spacing:.05em;
+    letter-spacing:.05em; transition:0.2s;
   }
   .add-page-btn:hover{ background:rgba(201,166,104,.08); }
+
+  /* ---------- SOMMAIRE MODAL ---------- */
+  .sommaire-list {
+    max-height: 50vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  .sommaire-item {
+    background: var(--bg-panel-2);
+    padding: 0.8rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: 0.2s;
+    text-align: left;
+  }
+  .sommaire-item:hover { border-color: var(--gold); }
+  .sommaire-item-date {
+    color: var(--gold-soft);
+    font-weight: 500;
+    font-size: 0.95rem;
+    margin-bottom: 0.2rem;
+  }
+  .sommaire-item-caption {
+    font-size: 0.8rem;
+    color: var(--cream);
+    opacity: 0.8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
   /* ---------- MAP ---------- */
   #map{
@@ -168,7 +216,7 @@
     background:var(--bg-panel); border:1px solid var(--line); border-radius:12px;
     padding:1.8rem; width:100%; max-width:420px; max-height:90vh; overflow:auto;
   }
-  .modal h3{ margin:0 0 1.2rem; color:var(--gold-soft); font-size:1.5rem; }
+  .modal h3{ margin:0 0 0.5rem; color:var(--gold-soft); font-size:1.5rem; text-align:center;}
   .field{ margin-bottom:1rem; }
   .field label{ display:block; font-size:.75rem; letter-spacing:.05em; color:var(--rose-dust); margin-bottom:.35rem; text-transform:uppercase;}
   .field-hint{ font-size:.7rem; color:var(--rose-dust); opacity:.7; margin-top:.3rem; }
@@ -178,7 +226,7 @@
   }
   .field textarea{ resize:vertical; min-height:70px; }
   .or-sep{ text-align:center; font-size:.7rem; color:var(--rose-dust); letter-spacing:.1em; margin:.6rem 0; text-transform:uppercase; }
-  .modal-actions{ display:flex; gap:.7rem; margin-top:1.4rem; justify-content:flex-end; }
+  .modal-actions{ display:flex; gap:.7rem; margin-top:1.4rem; justify-content:center; }
   .btn-ghost{ background:none; border:1px solid var(--line); color:var(--cream); padding:.5rem 1.1rem; border-radius:6px; cursor:pointer; }
   .btn-solid{ background:var(--bordeaux); border:none; color:var(--cream); padding:.5rem 1.2rem; border-radius:6px; cursor:pointer; }
   .btn-solid:hover{ background:var(--bordeaux-bright); }
@@ -204,14 +252,11 @@
   <div class="hero-orn">✦</div>
   <h1 id="heroTitle">Bon anniversaire, mon amour</h1>
   <div class="names" id="heroSub">19 ans d'elle, et notre histoire qui continue</div>
-  <div class="hero-edit-row"><button class="edit-btn" onclick="editHero()">modifier le texte</button></div>
 
   <div class="countdown-wrap">
     <div class="countdown-label" id="cdLabel">avant nos prochaines retrouvailles</div>
     <div class="countdown" id="countdown"></div>
-    <div class="countdown-edit">
-      <button class="edit-btn" onclick="toggleCdEdit()">modifier la date</button>
-    </div>
+    <button class="edit-btn" onclick="toggleCdEdit()">modifier la date</button>
     <div class="countdown-edit" id="cdEditRow" style="display:none;">
       <input type="datetime-local" id="cdInput">
       <button class="save-mini" onclick="saveCountdown()">enregistrer</button>
@@ -225,11 +270,14 @@
   <h2 class="section-title">Nos souvenirs, page après page</h2>
   <div class="book-stage">
     <div class="book" id="bookEl"></div>
+    
     <div class="book-nav">
       <button class="nav-btn" id="prevBtn" onclick="turnPage(-1)">‹</button>
-      <div class="page-indicator" id="pageIndicator"></div>
+      <button class="nav-btn sommaire-btn" onclick="openSommaire()">Sommaire</button>
       <button class="nav-btn" id="nextBtn" onclick="turnPage(1)">›</button>
     </div>
+    <div class="page-indicator" id="pageIndicator"></div>
+    
     <button class="add-page-btn" onclick="openPageModal()">+ ajouter un souvenir</button>
   </div>
 </div>
@@ -246,6 +294,17 @@
   <span class="serif">À nous, à tout ce qui vient encore.</span>
   Fait avec amour, pour tes 19 ans.
 </footer>
+
+<div class="modal-overlay" id="sommaireModal">
+  <div class="modal">
+    <h3>Sommaire</h3>
+    <div style="text-align:center; color:var(--rose-dust); font-size:0.8rem; margin-bottom: 0.5rem;">Choisis une date pour y sauter directement</div>
+    <div id="sommaireList" class="sommaire-list"></div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeModal('sommaireModal')">Fermer</button>
+    </div>
+  </div>
+</div>
 
 <div class="modal-overlay" id="pageModal">
   <div class="modal">
@@ -310,11 +369,9 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
   import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-  // Ta configuration Firebase avec le lien de la base de données ajouté
   const firebaseConfig = {
     apiKey: "AIzaSyDYduH8slZP7WrG0Y_5_JR9mwyaXQcKcDY",
     authDomain: "hannah-930e0.firebaseapp.com",
-    // J'ai ajouté l'URL de la base de données ici (format européen par défaut)
     databaseURL: "https://hannah-930e0-default-rtdb.europe-west1.firebasedatabase.app",
     projectId: "hannah-930e0",
     storageBucket: "hannah-930e0.firebasestorage.app",
@@ -325,25 +382,9 @@
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
 
-  // On expose nos fonctions au reste du site
   window.firebaseSet = function(key, value) {
     set(ref(db, 'site_data/' + key), value);
   };
-
-  // Écouteurs en temps réel !
-  onValue(ref(db, 'site_data/hero-title'), (snapshot) => {
-    if(snapshot.exists()) {
-      window.heroTitle = snapshot.val();
-      document.getElementById('heroTitle').textContent = window.heroTitle;
-    }
-  });
-
-  onValue(ref(db, 'site_data/hero-sub'), (snapshot) => {
-    if(snapshot.exists()) {
-      window.heroSub = snapshot.val();
-      document.getElementById('heroSub').textContent = window.heroSub;
-    }
-  });
 
   onValue(ref(db, 'site_data/countdown-date'), (snapshot) => {
     if(snapshot.exists()) {
@@ -371,8 +412,6 @@
 <script>
   const SITE_PASSWORD = "notrehistoire";
 
-  window.heroTitle = "Bon anniversaire, mon amour";
-  window.heroSub = "19 ans d'elle, et notre histoire qui continue";
   window.countdownDate = new Date(new Date().getTime() + 14*24*60*60*1000).toISOString();
   window.pages = [];
   window.pins = [];
@@ -413,17 +452,6 @@
     if(!d) return '';
     const dt = new Date(d+'T00:00:00');
     return dt.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
-  }
-
-  function editHero(){
-    const t = prompt('Titre principal :', window.heroTitle);
-    if(t===null) return;
-    const s = prompt('Sous-titre :', window.heroSub);
-    if(s===null) return;
-    if(window.firebaseSet) {
-      window.firebaseSet('hero-title', t);
-      window.firebaseSet('hero-sub', s);
-    }
   }
 
   function toggleCdEdit(){
@@ -475,10 +503,14 @@
     const book = document.getElementById('bookEl');
     if(!book) return;
     book.innerHTML = '';
+    
+    // 1. Trier les pages par ordre chronologique
+    window.pages.sort((a,b) => new Date(a.date||0) - new Date(b.date||0));
+    
     if(window.pages.length === 0){
       book.innerHTML = `<div class="page"><div class="page-empty">
-        <div class="serif" style="font-size:1.3rem;color:var(--gold-soft)">Votre histoire commence ici</div>
-        <div>Ajoutez votre première photo et sa petite anecdote.</div>
+        <div class="serif" style="font-size:1.6rem;color:#7a1f2b">Votre histoire commence ici</div>
+        <div style="font-size:0.95rem; color:#555;">Ajoutez votre première photo<br>et sa petite anecdote.</div>
       </div></div>`;
       document.getElementById('pageIndicator').textContent = '';
       document.getElementById('prevBtn').disabled = true;
@@ -486,6 +518,7 @@
       return;
     }
     if(window.currentPage >= window.pages.length) window.currentPage = Math.max(0, window.pages.length - 1);
+    
     const p = window.pages[window.currentPage];
     const photoHtml = p.photo ? `<img src="${p.photo}">` : '';
     book.innerHTML = `<div class="page">
@@ -493,10 +526,35 @@
       <div class="page-photo">${photoHtml}</div>
       <div class="page-caption">${p.caption || ''}<div class="page-date">${fmtDate(p.date)}</div></div>
     </div>`;
-    document.getElementById('pageIndicator').textContent = (window.currentPage+1) + ' / ' + window.pages.length;
+    document.getElementById('pageIndicator').textContent = 'Page ' + (window.currentPage+1) + ' / ' + window.pages.length;
     document.getElementById('prevBtn').disabled = window.currentPage === 0;
     document.getElementById('nextBtn').disabled = window.currentPage === window.pages.length - 1;
   };
+
+  window.openSommaire = function() {
+    const list = document.getElementById('sommaireList');
+    list.innerHTML = '';
+    
+    if(window.pages.length === 0) {
+      list.innerHTML = '<div style="text-align:center; color:var(--rose-dust); font-size:0.9rem;">Le livre est vide.</div>';
+    } else {
+      window.pages.forEach((p, index) => {
+        const item = document.createElement('div');
+        item.className = 'sommaire-item';
+        item.innerHTML = `
+          <div class="sommaire-item-date">${fmtDate(p.date) || 'Date inconnue'}</div>
+          <div class="sommaire-item-caption">${p.caption || 'Un beau souvenir...'}</div>
+        `;
+        item.onclick = () => {
+          window.currentPage = index;
+          window.renderBook();
+          closeModal('sommaireModal');
+        };
+        list.appendChild(item);
+      });
+    }
+    document.getElementById('sommaireModal').classList.add('open');
+  }
 
   function turnPage(dir){
     window.currentPage += dir;
@@ -524,8 +582,12 @@
     else if(file) { photo = await resizeImage(file, 900); }
     
     const id = 'p' + Date.now();
+    // On ajoute la page puis on laisse renderBook() faire le tri
     window.pages.push({id, date, caption, photo});
-    window.currentPage = window.pages.length - 1;
+    
+    // Pour que l'utilisateur soit emmené à la bonne page après le tri
+    window.pages.sort((a,b) => new Date(a.date||0) - new Date(b.date||0));
+    window.currentPage = window.pages.findIndex(p => p.id === id);
     
     if(window.firebaseSet) window.firebaseSet('book-pages', JSON.stringify(window.pages));
     closeModal('pageModal');
