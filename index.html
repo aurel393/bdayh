@@ -101,6 +101,7 @@
   .book{
     position:relative; width:min(100%, 640px); aspect-ratio:4/3;
     perspective: 1500px;
+    -webkit-perspective: 1500px; /* Sécurité pour Safari/iPhone */
   }
   
   .page {
@@ -108,8 +109,11 @@
     border-radius: 4px 16px 16px 4px;
     overflow:hidden;
     display:flex; flex-direction:column; 
+    -webkit-backface-visibility:hidden;
     backface-visibility:hidden;
+    -webkit-transform-origin: left center;
     transform-origin: left center;
+    -webkit-transition: -webkit-transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
     transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
   }
 
@@ -137,13 +141,13 @@
   }
   .cover-ornament { font-size: 2rem; color: var(--gold); text-align: center; margin-bottom: 1rem; }
 
-  .turning-next .page { transform: rotateY(-90deg); opacity: 0.5; }
+  .turning-next .page { -webkit-transform: rotateY(-90deg); transform: rotateY(-90deg); opacity: 0.5; }
   .turning-enter-next .page { animation: fadeInNext 0.5s ease-out forwards; }
   @keyframes fadeInNext {
     0% { opacity: 0; transform: scale(0.98); }
     100% { opacity: 1; transform: scale(1); }
   }
-  .turning-prev .page { opacity: 0; transform: scale(0.98); }
+  .turning-prev .page { opacity: 0; -webkit-transform: scale(0.98); transform: scale(0.98); }
   .turning-enter-prev .page { animation: swingInPrev 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
   @keyframes swingInPrev {
     0% { transform: rotateY(-90deg); opacity: 0.5; }
@@ -250,17 +254,16 @@
     font-size: 1.2rem;
     line-height: 1.8;
     color: var(--cream);
-    white-space: pre-wrap; /* Garde les retours à la ligne ! */
+    white-space: pre-wrap;
     font-style: italic;
   }
-
 </style>
 </head>
 <body>
 
 <div class="hero">
   <div class="hero-orn">✦</div>
-  <h1 id="heroTitle">Bon anniversairer</h1>
+  <h1 id="heroTitle">Bon anniversaire</h1>
   <div class="names" id="heroSub">19 ans que tu rayonnes et que tu rends ton entourage heureux</div>
   
   <div class="hero-edit-row admin-only admin-block">
@@ -410,7 +413,6 @@
   </div>
 </div>
 
-<!-- MODAL LETTRE D'AMOUR -->
 <div class="modal-overlay" id="letterModal">
   <div class="modal" style="max-width: 600px;">
     <h3>Ta lettre d'amour</h3>
@@ -425,7 +427,6 @@
   </div>
 </div>
 
-<!-- MODULE FIREBASE -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
   import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
@@ -461,7 +462,6 @@
     }
   });
 
-  // Écouteurs pour le Footer
   onValue(ref(db, 'site_data/footer-1'), (snapshot) => {
     if(snapshot.exists()) {
       window.footerText1 = snapshot.val();
@@ -476,7 +476,6 @@
     }
   });
 
-  // Écouteur pour la lettre d'amour
   onValue(ref(db, 'site_data/love-letter'), (snapshot) => {
     if(snapshot.exists()) {
       window.loveLetterText = snapshot.val();
@@ -491,32 +490,43 @@
     }
   });
 
+  // Protection anti-corruption JSON rajoutée ici
   onValue(ref(db, 'site_data/book-pages'), (snapshot) => {
     if(snapshot.exists()) {
-      window.pages = JSON.parse(snapshot.val());
+      try {
+        window.pages = JSON.parse(snapshot.val()) || [];
+        if(!Array.isArray(window.pages)) window.pages = [];
+      } catch(e) {
+        window.pages = [];
+      }
       window.renderBook();
     }
   });
 
   onValue(ref(db, 'site_data/map-pins'), (snapshot) => {
     if(snapshot.exists()) {
-      window.pins = JSON.parse(snapshot.val());
+      try {
+        window.pins = JSON.parse(snapshot.val()) || [];
+        if(!Array.isArray(window.pins)) window.pins = [];
+      } catch(e) {
+        window.pins = [];
+      }
       window.renderPins();
     }
   });
 </script>
 
-<!-- SCRIPT DU SITE -->
 <script>
-  // MOT DE PASSE POUR AFFICHER LES BOUTONS ADMIN
   const ADMIN_PASSWORD = "notrehistoire";
 
   window.isAdmin = false;
-  window.heroTitle = "Bon anniversaire, mon amour";
-  window.heroSub = "19 ans d'elle, et notre histoire qui continue";
-  window.footerText1 = "À nous, à tout ce qui vient encore.";
-  window.footerText2 = "Fait avec amour, pour tes 19 ans.";
+  // Tes textes par défaut sont intégrés ICI :
+  window.heroTitle = "Bon anniversaire";
+  window.heroSub = "19 ans que tu rayonnes et que tu rends ton entourage heureux";
+  window.footerText1 = "À nous, pour toujours (et c'est moi qui t'aime +)";
+  window.footerText2 = "JE T'AIME, aurel";
   window.loveLetterText = "";
+  
   window.countdownDate = new Date(new Date().getTime() + 14*24*60*60*1000).toISOString();
   window.pages = [];
   window.pins = [];
@@ -524,6 +534,9 @@
   window.pendingLatLng = null;
   window.map = null;
   window.markersLayer = null;
+  
+  // VERROU D'ANIMATION
+  window.isTurning = false;
 
   function unlockAdmin(){
     const pwd = document.getElementById('adminPwd').value;
@@ -623,7 +636,7 @@
       el.innerHTML = '';
       return;
     }
-    label.textContent = "avant nos prochaines retrouvailles";
+    label.textContent = "avant la prochaine fois qu'on se voit";
     const days = Math.floor(diff/(1000*60*60*24));
     const hours = Math.floor((diff/(1000*60*60))%24);
     const mins = Math.floor((diff/(1000*60))%60);
@@ -674,8 +687,14 @@
     document.getElementById('nextBtn').disabled = window.currentPage === window.pages.length - 1;
   };
 
+  // Sécurité anti spam ajoutée ici !
   function turnPage(dir){
+    if (window.isTurning) return; 
+    
     const bookContainer = document.getElementById('bookEl');
+    if (!bookContainer) return;
+
+    window.isTurning = true;
     
     if(dir > 0) bookContainer.classList.add('turning-next');
     else bookContainer.classList.add('turning-prev');
@@ -692,6 +711,7 @@
       
       setTimeout(() => {
         bookContainer.classList.remove('turning-enter-next', 'turning-enter-prev');
+        window.isTurning = false;
       }, 500);
       
     }, 400); 
