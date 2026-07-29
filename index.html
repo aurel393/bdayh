@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notre histoire</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+  :root{
+    --bg-deep:#170709;
+    --bg-panel:#260f16;
+    --bg-panel-2:#301218;
+    --bordeaux:#7a1f2b;
+    --bordeaux-bright:#a5334a;
+    --gold:#c9a668;
+    --gold-soft:#e3cfa0;
+    --cream:#f4e8da;
+    --rose-dust:#c98a93;
+    --line: rgba(201,166,104,.25);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg-deep);
+    color:var(--cream);
+    font-family:'Work Sans', sans-serif;
+    font-weight:300;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.serif{ font-family:'Cormorant Garamond', serif; }
+  .section{ padding:5rem 1.5rem; max-width:1100px; margin:0 auto; position:relative; }
+  .eyebrow{
+    text-transform:uppercase; letter-spacing:.25em; font-size:.7rem;
+    color:var(--gold); text-align:center; margin-bottom:.6rem;
+  }
+  .section-title{
+    text-align:center; font-size:2.6rem; font-weight:500; margin:0 0 3rem;
+    color:var(--gold-soft);
+  }
+  ::selection{ background:var(--bordeaux-bright); color:var(--cream); }
+
+  /* ---------- LOCK SCREEN ---------- */
+  #lockScreen{
+    position:fixed; inset:0; z-index:2000; background:var(--bg-deep);
+    display:flex; align-items:center; justify-content:center; flex-direction:column;
+    text-align:center; padding:2rem;
+  }
+  #lockScreen.hidden{ display:none; }
+  .lock-orn{ font-size:1.4rem; color:var(--gold); letter-spacing:.4em; margin-bottom:1.4rem; }
+  .lock-title{ font-size:1.8rem; color:var(--gold-soft); margin:0 0 1.6rem; }
+  .lock-row{ display:flex; gap:.6rem; align-items:center; }
+  .lock-row input{
+    background:var(--bg-panel); border:1px solid var(--line); color:var(--cream);
+    padding:.6rem .8rem; border-radius:6px; font-family:'Work Sans'; font-size:.95rem; width:220px;
+  }
+  .lock-error{ color:var(--rose-dust); font-size:.8rem; margin-top:.8rem; min-height:1rem; }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    min-height:100svh; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:2rem 1.5rem;
+    background:
+      radial-gradient(ellipse at 50% -10%, rgba(165,51,74,.35), transparent 60%),
+      radial-gradient(ellipse at 50% 110%, rgba(122,31,43,.4), transparent 60%),
+      var(--bg-deep);
+    position:relative;
+  }
+  .hero-orn{ font-size:1.4rem; color:var(--gold); letter-spacing:.4em; margin-bottom:1rem;}
+  .hero h1{
+    font-size:clamp(2.2rem, 7vw, 4.2rem); font-weight:500; margin:0; line-height:1.1;
+    color:var(--cream);
+  }
+  .hero .names{
+    font-style:italic; color:var(--gold-soft); font-size:clamp(1.1rem,3vw,1.5rem); margin-top:1rem;
+  }
+  .edit-btn{
+    background:none; border:1px solid var(--line); color:var(--gold);
+    border-radius:20px; padding:.25rem .8rem; font-size:.7rem; font-family:'Work Sans';
+    cursor:pointer; opacity:.7; transition:.2s; letter-spacing:.05em;
+  }
+  .edit-btn:hover{ opacity:1; border-color:var(--gold); background:rgba(201,166,104,.08); }
+  .hero-edit-row{ margin-top:.8rem; }
+
+  .countdown-wrap{ margin-top:3rem; }
+  .countdown-label{ font-size:.8rem; letter-spacing:.2em; text-transform:uppercase; color:var(--rose-dust); margin-bottom:1rem; }
+  .countdown{ display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; }
+  .cd-box{
+    background:var(--bg-panel); border:1px solid var(--line); border-radius:10px;
+    padding:1rem 1.2rem; min-width:76px;
+  }
+  .cd-num{ font-size:2.2rem; font-weight:500; color:var(--gold-soft); font-family:'Cormorant Garamond'; }
+  .cd-unit{ font-size:.65rem; letter-spacing:.15em; text-transform:uppercase; color:var(--rose-dust); margin-top:.2rem; }
+  .countdown-edit{ margin-top:1.2rem; display:flex; gap:.6rem; justify-content:center; align-items:center; flex-wrap:wrap; }
+  .countdown-edit input[type=datetime-local]{
+    background:var(--bg-panel); border:1px solid var(--line); color:var(--cream);
+    padding:.4rem .6rem; border-radius:6px; font-family:'Work Sans'; font-size:.85rem;
+  }
+  .save-mini{
+    background:var(--bordeaux); border:none; color:var(--cream); padding:.4rem .9rem;
+    border-radius:6px; cursor:pointer; font-size:.8rem;
+  }
+  .save-mini:hover{ background:var(--bordeaux-bright); }
+  .scroll-hint{ position:absolute; bottom:2rem; font-size:.7rem; letter-spacing:.2em; color:var(--rose-dust); }
+
+  /* ---------- BOOK ---------- */
+  .book-stage{ display:flex; flex-direction:column; align-items:center; }
+  .book{
+    position:relative; width:min(100%, 640px); aspect-ratio:4/3;
+    perspective:1800px;
+  }
+  .page{
+    position:absolute; inset:0; background:var(--bg-panel);
+    border:1px solid var(--line); border-radius:8px; overflow:hidden;
+    display:flex; flex-direction:column; box-shadow:0 20px 50px rgba(0,0,0,.5);
+    backface-visibility:hidden;
+  }
+  .page-photo{ flex:1; background:var(--bg-panel-2); position:relative; overflow:hidden; }
+  .page-photo img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .page-empty{
+    display:flex; align-items:center; justify-content:center; height:100%; flex-direction:column; gap:.8rem;
+    color:var(--rose-dust); text-align:center; padding:1.5rem;
+  }
+  .page-caption{
+    padding:.9rem 1.2rem; font-family:'Cormorant Garamond'; font-style:italic; font-size:1.1rem;
+    color:var(--gold-soft); border-top:1px solid var(--line); min-height:2.4rem;
+  }
+  .page-date{ font-size:.7rem; color:var(--rose-dust); font-family:'Work Sans'; letter-spacing:.08em; margin-top:.2rem;}
+  .page-del{ position:absolute; top:.6rem; right:.6rem; background:rgba(23,7,9,.6); border:1px solid var(--line); color:var(--rose-dust); font-size:.65rem; padding:.2rem .6rem; border-radius:12px; cursor:pointer; }
+  .book-nav{ display:flex; align-items:center; gap:1.5rem; margin-top:1.6rem; }
+  .nav-btn{
+    background:var(--bg-panel); border:1px solid var(--line); color:var(--gold-soft);
+    width:42px; height:42px; border-radius:50%; cursor:pointer; font-size:1.1rem; display:flex; align-items:center; justify-content:center;
+  }
+  .nav-btn:hover{ border-color:var(--gold); }
+  .nav-btn:disabled{ opacity:.3; cursor:default; }
+  .page-indicator{ font-size:.8rem; color:var(--rose-dust); letter-spacing:.1em; min-width:70px; text-align:center;}
+  .add-page-btn{
+    margin-top:1.4rem; background:none; border:1px dashed var(--gold); color:var(--gold-soft);
+    padding:.6rem 1.4rem; border-radius:24px; cursor:pointer; font-family:'Work Sans'; font-size:.85rem;
+    letter-spacing:.05em;
+  }
+  .add-page-btn:hover{ background:rgba(201,166,104,.08); }
+
+  /* ---------- MAP ---------- */
+  #map{
+    width:100%; height:460px; border-radius:12px; border:1px solid var(--line);
+    filter:saturate(.25) sepia(.35) hue-rotate(300deg) brightness(.9) contrast(1.05);
+  }
+  .map-hint{ text-align:center; font-size:.8rem; color:var(--rose-dust); margin-top:1rem; }
+  .leaflet-popup-content-wrapper{ background:var(--bg-panel)!important; color:var(--cream)!important; border-radius:8px!important; }
+  .leaflet-popup-tip{ background:var(--bg-panel)!important; }
+  .popup-title{ font-family:'Cormorant Garamond'; font-size:1.2rem; color:var(--gold-soft); margin:0 0 .2rem; }
+  .popup-date{ font-size:.7rem; color:var(--rose-dust); letter-spacing:.05em; margin-bottom:.4rem; }
+  .popup-photo{ width:100%; max-width:220px; border-radius:6px; margin-bottom:.4rem; display:block; }
+  .popup-text{ font-size:.85rem; line-height:1.5; margin:0; }
+  .popup-del{ margin-top:.5rem; background:none; border:1px solid var(--line); color:var(--rose-dust); font-size:.7rem; padding:.2rem .6rem; border-radius:12px; cursor:pointer; }
+
+  /* ---------- MODAL ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(10,3,4,.75); display:none;
+    align-items:center; justify-content:center; z-index:999; padding:1rem;
+  }
+  .modal-overlay.open{ display:flex; }
+  .modal{
+    background:var(--bg-panel); border:1px solid var(--line); border-radius:12px;
+    padding:1.8rem; width:100%; max-width:420px; max-height:90vh; overflow:auto;
+  }
+  .modal h3{ margin:0 0 1.2rem; color:var(--gold-soft); font-size:1.5rem; }
+  .field{ margin-bottom:1rem; }
+  .field label{ display:block; font-size:.75rem; letter-spacing:.05em; color:var(--rose-dust); margin-bottom:.35rem; text-transform:uppercase;}
+  .field-hint{ font-size:.7rem; color:var(--rose-dust); opacity:.7; margin-top:.3rem; }
+  .field input, .field textarea{
+    width:100%; background:var(--bg-panel-2); border:1px solid var(--line); color:var(--cream);
+    padding:.55rem .7rem; border-radius:6px; font-family:'Work Sans'; font-size:.9rem;
+  }
+  .field textarea{ resize:vertical; min-height:70px; }
+  .or-sep{ text-align:center; font-size:.7rem; color:var(--rose-dust); letter-spacing:.1em; margin:.6rem 0; text-transform:uppercase; }
+  .modal-actions{ display:flex; gap:.7rem; margin-top:1.4rem; justify-content:flex-end; }
+  .btn-ghost{ background:none; border:1px solid var(--line); color:var(--cream); padding:.5rem 1.1rem; border-radius:6px; cursor:pointer; }
+  .btn-solid{ background:var(--bordeaux); border:none; color:var(--cream); padding:.5rem 1.2rem; border-radius:6px; cursor:pointer; }
+  .btn-solid:hover{ background:var(--bordeaux-bright); }
+
+  footer{ text-align:center; padding:3rem 1.5rem 4rem; color:var(--rose-dust); font-size:.8rem; letter-spacing:.05em; }
+  footer .serif{ font-size:1.4rem; color:var(--gold-soft); display:block; margin-bottom:.6rem; }
+  .divider{ width:60px; height:1px; background:var(--gold); opacity:.5; margin:0 auto 2.5rem; }
+</style>
+</head>
+<body>
+
+<div id="lockScreen">
+  <div class="lock-orn">✦</div>
+  <h2 class="lock-title">Un mot de passe pour entrer</h2>
+  <div class="lock-row">
+    <input type="password" id="lockInput" placeholder="mot de passe" onkeydown="if(event.key==='Enter')tryUnlock()">
+    <button class="save-mini" onclick="tryUnlock()">entrer</button>
+  </div>
+  <div class="lock-error" id="lockError"></div>
+</div>
+
+<div class="hero">
+  <div class="hero-orn">✦</div>
+  <h1 id="heroTitle">Bon anniversaire, mon amour</h1>
+  <div class="names" id="heroSub">19 ans d'elle, et notre histoire qui continue</div>
+  <div class="hero-edit-row"><button class="edit-btn" onclick="editHero()">modifier le texte</button></div>
+
+  <div class="countdown-wrap">
+    <div class="countdown-label" id="cdLabel">avant nos prochaines retrouvailles</div>
+    <div class="countdown" id="countdown"></div>
+    <div class="countdown-edit">
+      <button class="edit-btn" onclick="toggleCdEdit()">modifier la date</button>
+    </div>
+    <div class="countdown-edit" id="cdEditRow" style="display:none;">
+      <input type="datetime-local" id="cdInput">
+      <button class="save-mini" onclick="saveCountdown()">enregistrer</button>
+    </div>
+  </div>
+  <div class="scroll-hint">faites défiler ↓</div>
+</div>
+
+<div class="section" id="book-section">
+  <div class="eyebrow">notre livre</div>
+  <h2 class="section-title">Nos souvenirs, page après page</h2>
+  <div class="book-stage">
+    <div class="book" id="bookEl"></div>
+    <div class="book-nav">
+      <button class="nav-btn" id="prevBtn" onclick="turnPage(-1)">‹</button>
+      <div class="page-indicator" id="pageIndicator"></div>
+      <button class="nav-btn" id="nextBtn" onclick="turnPage(1)">›</button>
+    </div>
+    <button class="add-page-btn" onclick="openPageModal()">+ ajouter un souvenir</button>
+  </div>
+</div>
+
+<div class="section">
+  <div class="divider"></div>
+  <div class="eyebrow">notre carte</div>
+  <h2 class="section-title">La carte de nos retrouvailles</h2>
+  <div id="map"></div>
+  <div class="map-hint">Cliquez n'importe où sur la carte pour ajouter un lieu, une date et une anecdote.</div>
+</div>
+
+<footer>
+  <span class="serif">À nous, à tout ce qui vient encore.</span>
+  Fait avec amour, pour tes 19 ans.
+</footer>
+
+<div class="modal-overlay" id="pageModal">
+  <div class="modal">
+    <h3>Ajouter un souvenir</h3>
+    <div class="field">
+      <label>Photo (fichier)</label>
+      <input type="file" id="pageFile" accept="image/*">
+    </div>
+    <div class="or-sep">ou</div>
+    <div class="field">
+      <label>Lien d'image (URL)</label>
+      <input type="text" id="pageUrl" placeholder="https://...">
+    </div>
+    <div class="field">
+      <label>Date</label>
+      <input type="date" id="pageDate">
+    </div>
+    <div class="field">
+      <label>Légende / anecdote</label>
+      <textarea id="pageCaption" placeholder="Ce jour-là..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeModal('pageModal')">annuler</button>
+      <button class="btn-solid" onclick="savePage()">ajouter</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="pinModal">
+  <div class="modal">
+    <h3>Ajouter un lieu</h3>
+    <div class="field">
+      <label>Titre</label>
+      <input type="text" id="pinTitle" placeholder="Notre premier rendez-vous">
+    </div>
+    <div class="field">
+      <label>Date</label>
+      <input type="date" id="pinDate">
+    </div>
+    <div class="field">
+      <label>Photo (fichier, optionnel)</label>
+      <input type="file" id="pinFile" accept="image/*">
+    </div>
+    <div class="or-sep">ou</div>
+    <div class="field">
+      <label>Lien d'image (URL)</label>
+      <input type="text" id="pinUrl" placeholder="https://...">
+    </div>
+    <div class="field">
+      <label>Anecdote</label>
+      <textarea id="pinText" placeholder="Raconte ce moment..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeModal('pinModal')">annuler</button>
+      <button class="btn-solid" onclick="savePin()">ajouter</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE FIREBASE -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+  import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+  // Ta configuration Firebase avec le lien de la base de données ajouté
+  const firebaseConfig = {
+    apiKey: "AIzaSyDYduH8slZP7WrG0Y_5_JR9mwyaXQcKcDY",
+    authDomain: "hannah-930e0.firebaseapp.com",
+    // J'ai ajouté l'URL de la base de données ici (format européen par défaut)
+    databaseURL: "https://hannah-930e0-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "hannah-930e0",
+    storageBucket: "hannah-930e0.firebasestorage.app",
+    messagingSenderId: "623740037804",
+    appId: "1:623740037804:web:42170f7e6bfccf74fa8d09"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  // On expose nos fonctions au reste du site
+  window.firebaseSet = function(key, value) {
+    set(ref(db, 'site_data/' + key), value);
+  };
+
+  // Écouteurs en temps réel !
+  onValue(ref(db, 'site_data/hero-title'), (snapshot) => {
+    if(snapshot.exists()) {
+      window.heroTitle = snapshot.val();
+      document.getElementById('heroTitle').textContent = window.heroTitle;
+    }
+  });
+
+  onValue(ref(db, 'site_data/hero-sub'), (snapshot) => {
+    if(snapshot.exists()) {
+      window.heroSub = snapshot.val();
+      document.getElementById('heroSub').textContent = window.heroSub;
+    }
+  });
+
+  onValue(ref(db, 'site_data/countdown-date'), (snapshot) => {
+    if(snapshot.exists()) {
+      window.countdownDate = snapshot.val();
+      window.renderCountdown();
+    }
+  });
+
+  onValue(ref(db, 'site_data/book-pages'), (snapshot) => {
+    if(snapshot.exists()) {
+      window.pages = JSON.parse(snapshot.val());
+      window.renderBook();
+    }
+  });
+
+  onValue(ref(db, 'site_data/map-pins'), (snapshot) => {
+    if(snapshot.exists()) {
+      window.pins = JSON.parse(snapshot.val());
+      window.renderPins();
+    }
+  });
+</script>
+
+<!-- SCRIPT DU SITE -->
+<script>
+  const SITE_PASSWORD = "notrehistoire";
+
+  window.heroTitle = "Bon anniversaire, mon amour";
+  window.heroSub = "19 ans d'elle, et notre histoire qui continue";
+  window.countdownDate = new Date(new Date().getTime() + 14*24*60*60*1000).toISOString();
+  window.pages = [];
+  window.pins = [];
+  window.currentPage = 0;
+  window.pendingLatLng = null;
+  window.map = null;
+  window.markersLayer = null;
+
+  function tryUnlock(){
+    const v = document.getElementById('lockInput').value;
+    if(v === SITE_PASSWORD){
+      document.getElementById('lockScreen').classList.add('hidden');
+    } else {
+      document.getElementById('lockError').textContent = "Mot de passe incorrect.";
+    }
+  }
+
+  function resizeImage(file, maxW){
+    return new Promise((resolve)=>{
+      const reader = new FileReader();
+      reader.onload = (e)=>{
+        const img = new Image();
+        img.onload = ()=>{
+          let w = img.width, h = img.height;
+          if(w > maxW){ h = h*(maxW/w); w = maxW; }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img,0,0,w,h);
+          resolve(canvas.toDataURL('image/jpeg',0.7));
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function fmtDate(d){
+    if(!d) return '';
+    const dt = new Date(d+'T00:00:00');
+    return dt.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+  }
+
+  function editHero(){
+    const t = prompt('Titre principal :', window.heroTitle);
+    if(t===null) return;
+    const s = prompt('Sous-titre :', window.heroSub);
+    if(s===null) return;
+    if(window.firebaseSet) {
+      window.firebaseSet('hero-title', t);
+      window.firebaseSet('hero-sub', s);
+    }
+  }
+
+  function toggleCdEdit(){
+    const row = document.getElementById('cdEditRow');
+    const open = row.style.display !== 'none';
+    row.style.display = open ? 'none' : 'flex';
+    if(!open){
+      const d = new Date(window.countdownDate);
+      const pad = n=>String(n).padStart(2,'0');
+      document.getElementById('cdInput').value = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+  }
+
+  function saveCountdown(){
+    const v = document.getElementById('cdInput').value;
+    if(!v) return;
+    const newDate = new Date(v).toISOString();
+    if(window.firebaseSet) window.firebaseSet('countdown-date', newDate);
+    document.getElementById('cdEditRow').style.display = 'none';
+  }
+
+  window.renderCountdown = function(){
+    const el = document.getElementById('countdown');
+    if(!el) return;
+    const now = new Date();
+    const target = new Date(window.countdownDate);
+    let diff = target - now;
+    const label = document.getElementById('cdLabel');
+    if(diff <= 0){
+      label.textContent = "vous êtes réunis !";
+      el.innerHTML = '';
+      return;
+    }
+    label.textContent = "avant nos prochaines retrouvailles";
+    const days = Math.floor(diff/(1000*60*60*24));
+    const hours = Math.floor((diff/(1000*60*60))%24);
+    const mins = Math.floor((diff/(1000*60))%60);
+    const secs = Math.floor((diff/1000)%60);
+    el.innerHTML = `
+      <div class="cd-box"><div class="cd-num">${days}</div><div class="cd-unit">jours</div></div>
+      <div class="cd-box"><div class="cd-num">${hours}</div><div class="cd-unit">heures</div></div>
+      <div class="cd-box"><div class="cd-num">${mins}</div><div class="cd-unit">minutes</div></div>
+      <div class="cd-box"><div class="cd-num">${secs}</div><div class="cd-unit">secondes</div></div>
+    `;
+  };
+  setInterval(window.renderCountdown, 1000);
+
+  window.renderBook = function(){
+    const book = document.getElementById('bookEl');
+    if(!book) return;
+    book.innerHTML = '';
+    if(window.pages.length === 0){
+      book.innerHTML = `<div class="page"><div class="page-empty">
+        <div class="serif" style="font-size:1.3rem;color:var(--gold-soft)">Votre histoire commence ici</div>
+        <div>Ajoutez votre première photo et sa petite anecdote.</div>
+      </div></div>`;
+      document.getElementById('pageIndicator').textContent = '';
+      document.getElementById('prevBtn').disabled = true;
+      document.getElementById('nextBtn').disabled = true;
+      return;
+    }
+    if(window.currentPage >= window.pages.length) window.currentPage = Math.max(0, window.pages.length - 1);
+    const p = window.pages[window.currentPage];
+    const photoHtml = p.photo ? `<img src="${p.photo}">` : '';
+    book.innerHTML = `<div class="page">
+      <button class="page-del" onclick="deletePage('${p.id}')">supprimer</button>
+      <div class="page-photo">${photoHtml}</div>
+      <div class="page-caption">${p.caption || ''}<div class="page-date">${fmtDate(p.date)}</div></div>
+    </div>`;
+    document.getElementById('pageIndicator').textContent = (window.currentPage+1) + ' / ' + window.pages.length;
+    document.getElementById('prevBtn').disabled = window.currentPage === 0;
+    document.getElementById('nextBtn').disabled = window.currentPage === window.pages.length - 1;
+  };
+
+  function turnPage(dir){
+    window.currentPage += dir;
+    if(window.currentPage < 0) window.currentPage = 0;
+    if(window.currentPage > window.pages.length-1) window.currentPage = window.pages.length-1;
+    window.renderBook();
+  }
+
+  function openPageModal(){
+    document.getElementById('pageFile').value = '';
+    document.getElementById('pageUrl').value = '';
+    document.getElementById('pageDate').value = '';
+    document.getElementById('pageCaption').value = '';
+    document.getElementById('pageModal').classList.add('open');
+  }
+
+  async function savePage(){
+    const file = document.getElementById('pageFile').files[0];
+    const url = document.getElementById('pageUrl').value.trim();
+    const date = document.getElementById('pageDate').value;
+    const caption = document.getElementById('pageCaption').value;
+    let photo = null;
+    
+    if(url) { photo = url; }
+    else if(file) { photo = await resizeImage(file, 900); }
+    
+    const id = 'p' + Date.now();
+    window.pages.push({id, date, caption, photo});
+    window.currentPage = window.pages.length - 1;
+    
+    if(window.firebaseSet) window.firebaseSet('book-pages', JSON.stringify(window.pages));
+    closeModal('pageModal');
+  }
+
+  function deletePage(id){
+    window.pages = window.pages.filter(p=>p.id!==id);
+    if(window.firebaseSet) window.firebaseSet('book-pages', JSON.stringify(window.pages));
+  }
+
+  function initMap(){
+    window.map = L.map('map', {zoomControl:true}).setView([46.6,2.4], 5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution:'&copy; OpenStreetMap',
+      maxZoom:18
+    }).addTo(window.map);
+    window.markersLayer = L.layerGroup().addTo(window.map);
+    
+    window.map.on('click', (e)=>{
+      window.pendingLatLng = e.latlng;
+      document.getElementById('pinTitle').value = '';
+      document.getElementById('pinDate').value = '';
+      document.getElementById('pinFile').value = '';
+      document.getElementById('pinUrl').value = '';
+      document.getElementById('pinText').value = '';
+      document.getElementById('pinModal').classList.add('open');
+    });
+    window.renderPins();
+  }
+
+  function goldIcon(){
+    return L.divIcon({
+      className:'',
+      html:`<div style="width:16px;height:16px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:#a5334a;border:2px solid #e3cfa0;"></div>`,
+      iconSize:[16,16], iconAnchor:[8,16]
+    });
+  }
+
+  window.renderPins = function(){
+    if(!window.markersLayer) return;
+    window.markersLayer.clearLayers();
+    const sorted = [...window.pins].sort((a,b)=> new Date(a.date||0) - new Date(b.date||0));
+    if(sorted.length > 1){
+      L.polyline(sorted.map(p=>[p.lat,p.lng]), {color:'#c9a668', weight:2, dashArray:'4 8', opacity:.7}).addTo(window.markersLayer);
+    }
+    window.pins.forEach(p=>{
+      const photoHtml = p.photo ? `<img class="popup-photo" src="${p.photo}">` : '';
+      const html = `<div>
+        <div class="popup-title">${p.title||''}</div>
+        <div class="popup-date">${fmtDate(p.date)}</div>
+        ${photoHtml}
+        <p class="popup-text">${p.text||''}</p>
+        <button class="popup-del" onclick="deletePin('${p.id}')">supprimer</button>
+      </div>`;
+      L.marker([p.lat,p.lng], {icon:goldIcon()}).addTo(window.markersLayer).bindPopup(html);
+    });
+  };
+
+  async function savePin(){
+    if(!window.pendingLatLng) return;
+    const file = document.getElementById('pinFile').files[0];
+    const url = document.getElementById('pinUrl').value.trim();
+    let photo = null;
+    if(url){ photo = url; }
+    else if(file){ photo = await resizeImage(file, 700); }
+    const pin = {
+      id:'m'+Date.now(),
+      lat:window.pendingLatLng.lat, lng:window.pendingLatLng.lng,
+      title:document.getElementById('pinTitle').value,
+      date:document.getElementById('pinDate').value,
+      text:document.getElementById('pinText').value,
+      photo
+    };
+    window.pins.push(pin);
+    if(window.firebaseSet) window.firebaseSet('map-pins', JSON.stringify(window.pins));
+    closeModal('pinModal');
+  }
+
+  function deletePin(id){
+    window.pins = window.pins.filter(p=>p.id!==id);
+    if(window.firebaseSet) window.firebaseSet('map-pins', JSON.stringify(window.pins));
+  }
+
+  function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+  // Initialisation de la page
+  window.renderCountdown();
+  window.renderBook();
+  initMap();
+</script>
+</body>
+</html>
