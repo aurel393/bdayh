@@ -32,6 +32,7 @@
   }
   h1,h2,h3,.serif{ font-family:'Cormorant Garamond', serif; }
   .section{ padding:5rem 1.5rem; max-width:1100px; margin:0 auto; position:relative; }
+  
   .eyebrow{
     text-transform:uppercase; letter-spacing:.25em; font-size:.7rem;
     color:var(--gold); text-align:center; margin-bottom:.6rem;
@@ -42,11 +43,33 @@
   }
   ::selection{ background:var(--bordeaux-bright); color:var(--cream); }
 
-  /* ---------- SYSTEME ADMIN CACHE ---------- */
+  /* ---------- SYSTEME ADMIN AVANCE ---------- */
   .admin-only { display: none !important; }
   body.admin-mode .admin-inline { display: inline-block !important; }
   body.admin-mode .admin-block { display: block !important; }
   body.admin-mode .admin-flex { display: flex !important; }
+
+  /* Style des textes cliquables/modifiables en mode Admin */
+  body.admin-mode .editable {
+    border: 1px dashed rgba(201,166,104,0.5);
+    border-radius: 4px;
+    transition: background 0.2s, border-color 0.2s;
+    padding: 2px 6px;
+    cursor: text;
+    display: inline-block;
+  }
+  body.admin-mode .editable:hover {
+    background: rgba(201,166,104,0.1);
+    border-color: var(--gold);
+  }
+  body.admin-mode .editable:focus {
+    background: rgba(201,166,104,0.15);
+    outline: none;
+    border-color: var(--gold);
+  }
+  body.admin-mode h1.editable, body.admin-mode h2.editable, body.admin-mode .names.editable {
+    display: block; 
+  }
 
   /* ---------- HERO ---------- */
   .hero{
@@ -66,7 +89,6 @@
   .hero .names{
     font-style:italic; color:var(--gold-soft); font-size:clamp(1.1rem,3vw,1.5rem); margin-top:1rem;
   }
-  .hero-edit-row { margin-top: 1rem; }
 
   /* Countdown CSS */
   .countdown-wrap{ margin-top:4rem; }
@@ -101,7 +123,7 @@
   .book{
     position:relative; width:min(100%, 640px); aspect-ratio:4/3;
     perspective: 1500px;
-    -webkit-perspective: 1500px; /* Sécurité pour Safari/iPhone */
+    -webkit-perspective: 1500px;
   }
   
   .page {
@@ -154,8 +176,26 @@
     100% { transform: rotateY(0deg); opacity: 1; }
   }
 
-  .page-photo{ flex:1; padding: 1.5rem 1.5rem 0.5rem 3.2rem; position:relative; overflow:hidden; }
-  .page-photo img{ width:100%; height:100%; object-fit:cover; display:block; border-radius:4px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+  /* --- CORRECTION POUR LES PHOTOS VERTICALES --- */
+  .page-photo { 
+    flex:1; 
+    padding: 1.5rem 1.5rem 0.5rem 3.2rem; 
+    position:relative; 
+    overflow:hidden; 
+    display:flex; 
+    align-items:center; 
+    justify-content:center; 
+  }
+  .page-photo img { 
+    max-width:100%; 
+    max-height:100%; 
+    object-fit:contain; /* Permet à la photo de ne plus être coupée */
+    display:block; 
+    border-radius:4px; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+  }
+  /* ------------------------------------------- */
+
   .page-empty{
     display:flex; align-items:center; justify-content:center; height:100%; flex-direction:column; gap:.8rem;
     text-align:center; padding:1.5rem 1.5rem 1.5rem 3.2rem;
@@ -263,18 +303,15 @@
 
 <div class="hero">
   <div class="hero-orn">✦</div>
-  <h1 id="heroTitle">Bon anniversaire</h1>
-  <div class="names" id="heroSub">19 ans que tu rayonnes et que tu rends ton entourage heureux</div>
-  
-  <div class="hero-edit-row admin-only admin-block">
-    <button class="edit-btn" onclick="editHero()">modifier le texte</button>
-  </div>
+  <!-- On ajoute class="editable" et data-key="" à TOUS les textes ! -->
+  <h1 class="editable" data-key="heroTitle">Bon anniversaire</h1>
+  <div class="names editable" data-key="heroSub">19 ans que tu rayonnes et que tu rends ton entourage heureux</div>
 
   <div class="countdown-wrap">
-    <div class="countdown-label" id="cdLabel">avant la prochaine fois qu'on se voit</div>
+    <div class="countdown-label editable" data-key="cdLabel">avant la prochaine fois qu'on se voit</div>
     <div class="countdown" id="countdown"></div>
     
-    <button class="edit-btn admin-only admin-inline" onclick="toggleCdEdit()">modifier la date</button>
+    <button class="edit-btn admin-only admin-inline" onclick="toggleCdEdit()">modifier la date du compte à rebours</button>
     <div class="countdown-edit admin-only admin-flex" id="cdEditRow" style="display:none !important;">
       <input type="datetime-local" id="cdInput">
       <button class="save-mini" onclick="saveCountdown()">enregistrer</button>
@@ -284,8 +321,8 @@
 </div>
 
 <div class="section" id="book-section">
-  <div class="eyebrow">notre livre</div>
-  <h2 class="section-title">Nos souvenirs comme dans un livre</h2>
+  <div class="eyebrow editable" data-key="bookEyebrow">notre livre</div>
+  <h2 class="section-title editable" data-key="bookTitle">Nos souvenirs comme dans un livre</h2>
   <div class="book-stage">
     
     <div class="book" id="bookEl"></div>
@@ -303,22 +340,18 @@
 
 <div class="section">
   <div class="divider"></div>
-  <div class="eyebrow">notre carte</div>
-  <h2 class="section-title">La carte de nos retrouvailles</h2>
+  <div class="eyebrow editable" data-key="mapEyebrow">notre carte</div>
+  <h2 class="section-title editable" data-key="mapTitle">La carte de nos retrouvailles</h2>
   <div id="map"></div>
   
-  <div class="map-hint">Cliquez n'importe où sur la carte pour ajouter un lieu, une date et une anecdote.</div>
+  <div class="map-hint editable" data-key="mapHint">Cliquez n'importe où sur la carte pour ajouter un lieu, une date et une anecdote.</div>
 </div>
 
 <footer>
-  <span class="serif" id="footerText1">À nous, pour toujours (et c'est moi qui t'aime +)</span>
-  <span id="footerText2">JE T'AIME, aurel</span>
-  
-  <div class="admin-only admin-block" style="margin-top: 1rem;">
-    <button class="edit-btn" onclick="editFooter()">modifier le texte de fin</button>
-  </div>
+  <span class="serif editable" data-key="footerText1">À nous, pour toujours (et c'est moi qui t'aime +)</span>
+  <span class="editable" data-key="footerText2" style="display:block;">JE T'AIME, aurel</span>
 
-  <!-- SECTION LETTRE D'AMOUR -->
+  <!-- SECTION LETTRE D'AMOUR (la seule qui reste un bouton car le texte est trop long pour être édité directement sur la page) -->
   <div class="love-letter-wrap">
     <div id="loveLetterDisplay" class="love-letter-text"></div>
     <div class="admin-only admin-block" style="margin-top: 1rem;">
@@ -340,10 +373,11 @@
   
   <div id="adminPanel" style="display:none; text-align:center; color:var(--gold-soft); font-size:0.85rem; padding: 1rem; border: 1px dashed var(--line); border-radius: 8px;">
     ✓ <b>Mode Administrateur activé.</b><br>
-    Tu peux maintenant modifier tous les textes (titres, dates, pied de page, lettre d'amour). Les boutons sont apparus sur le site.
+    <span style="color:var(--cream);">✨ Tu peux maintenant cliquer directement sur n'importe quel texte de la page (titres, phrases) pour le modifier ! Ça s'enregistre tout seul quand tu cliques ailleurs.</span>
   </div>
 </div>
 
+<!-- MODALES RESTANTES -->
 <div class="modal-overlay" id="sommaireModal">
   <div class="modal">
     <h3>Sommaire</h3>
@@ -427,6 +461,7 @@
   </div>
 </div>
 
+<!-- MODULE FIREBASE -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
   import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
@@ -448,33 +483,29 @@
     set(ref(db, 'site_data/' + key), value);
   };
 
-  onValue(ref(db, 'site_data/hero-title'), (snapshot) => {
+  // NOUVEAU SYSTÈME GLOBAL POUR TOUS LES TEXTES
+  onValue(ref(db, 'site_data/texts'), (snapshot) => {
+    window.siteTextsLoaded = true;
     if(snapshot.exists()) {
-      window.heroTitle = snapshot.val();
-      document.getElementById('heroTitle').textContent = window.heroTitle;
+      window.siteTexts = { ...window.siteTexts, ...snapshot.val() };
+      
+      // Met à jour tous les textes sur la page (sauf si on est en train de taper dedans)
+      document.querySelectorAll('.editable').forEach(el => {
+        const k = el.getAttribute('data-key');
+        if(window.siteTexts[k] !== undefined && document.activeElement !== el) {
+          el.innerText = window.siteTexts[k];
+        }
+      });
+      // Met à jour la page de couverture si elle est affichée
+      if(window.currentPage === -1) window.renderBook();
     }
   });
 
-  onValue(ref(db, 'site_data/hero-sub'), (snapshot) => {
-    if(snapshot.exists()) {
-      window.heroSub = snapshot.val();
-      document.getElementById('heroSub').textContent = window.heroSub;
-    }
-  });
-
-  onValue(ref(db, 'site_data/footer-1'), (snapshot) => {
-    if(snapshot.exists()) {
-      window.footerText1 = snapshot.val();
-      document.getElementById('footerText1').textContent = window.footerText1;
-    }
-  });
-  
-  onValue(ref(db, 'site_data/footer-2'), (snapshot) => {
-    if(snapshot.exists()) {
-      window.footerText2 = snapshot.val();
-      document.getElementById('footerText2').textContent = window.footerText2;
-    }
-  });
+  // Retro-compatibilité (Au cas où tu avais déjà sauvegardé des trucs avant)
+  onValue(ref(db, 'site_data/hero-title'), s => { if(s.exists() && !window.siteTextsLoaded) document.querySelector('[data-key="heroTitle"]').innerText = s.val(); });
+  onValue(ref(db, 'site_data/hero-sub'), s => { if(s.exists() && !window.siteTextsLoaded) document.querySelector('[data-key="heroSub"]').innerText = s.val(); });
+  onValue(ref(db, 'site_data/footer-1'), s => { if(s.exists() && !window.siteTextsLoaded) document.querySelector('[data-key="footerText1"]').innerText = s.val(); });
+  onValue(ref(db, 'site_data/footer-2'), s => { if(s.exists() && !window.siteTextsLoaded) document.querySelector('[data-key="footerText2"]').innerText = s.val(); });
 
   onValue(ref(db, 'site_data/love-letter'), (snapshot) => {
     if(snapshot.exists()) {
@@ -490,27 +521,16 @@
     }
   });
 
-  // Protection anti-corruption JSON rajoutée ici
   onValue(ref(db, 'site_data/book-pages'), (snapshot) => {
     if(snapshot.exists()) {
-      try {
-        window.pages = JSON.parse(snapshot.val()) || [];
-        if(!Array.isArray(window.pages)) window.pages = [];
-      } catch(e) {
-        window.pages = [];
-      }
+      try { window.pages = JSON.parse(snapshot.val()) || []; } catch(e) { window.pages = []; }
       window.renderBook();
     }
   });
 
   onValue(ref(db, 'site_data/map-pins'), (snapshot) => {
     if(snapshot.exists()) {
-      try {
-        window.pins = JSON.parse(snapshot.val()) || [];
-        if(!Array.isArray(window.pins)) window.pins = [];
-      } catch(e) {
-        window.pins = [];
-      }
+      try { window.pins = JSON.parse(snapshot.val()) || []; } catch(e) { window.pins = []; }
       window.renderPins();
     }
   });
@@ -519,14 +539,23 @@
 <script>
   const ADMIN_PASSWORD = "notrehistoire";
 
+  // TES TEXTES PAR DÉFAUT
+  window.siteTexts = {
+    heroTitle: "Bon anniversaire",
+    heroSub: "19 ans que tu rayonnes et que tu rends ton entourage heureux",
+    cdLabel: "avant la prochaine fois qu'on se voit",
+    bookEyebrow: "notre livre",
+    bookTitle: "Nos souvenirs comme dans un livre",
+    coverTitle: "Notre histoire",
+    mapEyebrow: "notre carte",
+    mapTitle: "La carte de nos retrouvailles",
+    mapHint: "Cliquez n'importe où sur la carte pour ajouter un lieu, une date et une anecdote.",
+    footerText1: "À nous, pour toujours (et c'est moi qui t'aime +)",
+    footerText2: "JE T'AIME, aurel"
+  };
+
   window.isAdmin = false;
-  // Tes textes par défaut sont intégrés ICI :
-  window.heroTitle = "Bon anniversaire";
-  window.heroSub = "19 ans que tu rayonnes et que tu rends ton entourage heureux";
-  window.footerText1 = "À nous, pour toujours (et c'est moi qui t'aime +)";
-  window.footerText2 = "JE T'AIME, aurel";
   window.loveLetterText = "";
-  
   window.countdownDate = new Date(new Date().getTime() + 14*24*60*60*1000).toISOString();
   window.pages = [];
   window.pins = [];
@@ -534,10 +563,9 @@
   window.pendingLatLng = null;
   window.map = null;
   window.markersLayer = null;
-  
-  // VERROU D'ANIMATION
   window.isTurning = false;
 
+  // DÉVERROUILLER L'ADMIN
   function unlockAdmin(){
     const pwd = document.getElementById('adminPwd').value;
     if(pwd === ADMIN_PASSWORD){
@@ -545,10 +573,24 @@
       document.body.classList.add('admin-mode');
       document.getElementById('adminLogin').style.display = 'none';
       document.getElementById('adminPanel').style.display = 'block';
+      
+      // Rendre tous les textes modifiables !
+      document.querySelectorAll('.editable').forEach(el => {
+        el.setAttribute('contenteditable', 'true');
+      });
     } else {
       document.getElementById('adminError').textContent = "Mot de passe incorrect.";
     }
   }
+
+  // SAUVEGARDE AUTOMATIQUE QUAND ON MODIFIE UN TEXTE ET QU'ON CLIQUE AILLEURS
+  document.addEventListener('focusout', function(e) {
+    if (window.isAdmin && e.target.classList.contains('editable')) {
+      const key = e.target.getAttribute('data-key');
+      window.siteTexts[key] = e.target.innerText;
+      if(window.firebaseSet) window.firebaseSet('texts', window.siteTexts);
+    }
+  });
 
   function resizeImage(file, maxW){
     return new Promise((resolve)=>{
@@ -573,25 +615,6 @@
     if(!d) return '';
     const dt = new Date(d+'T00:00:00');
     return dt.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
-  }
-
-  function editHero(){
-    const t = prompt('Titre principal :', window.heroTitle);
-    if(t===null) return;
-    const s = prompt('Sous-titre :', window.heroSub);
-    if(s===null) return;
-    if(window.firebaseSet) {
-      window.firebaseSet('hero-title', t);
-      window.firebaseSet('hero-sub', s);
-    }
-  }
-
-  function editFooter(){
-    const f1 = prompt('Première phrase de fin (en grand) :', window.footerText1);
-    if(f1!==null && window.firebaseSet) window.firebaseSet('footer-1', f1);
-    
-    const f2 = prompt('Deuxième phrase de fin (en petit) :', window.footerText2);
-    if(f2!==null && window.firebaseSet) window.firebaseSet('footer-2', f2);
   }
 
   function openLetterModal(){
@@ -630,13 +653,12 @@
     const now = new Date();
     const target = new Date(window.countdownDate);
     let diff = target - now;
-    const label = document.getElementById('cdLabel');
+    
     if(diff <= 0){
-      label.textContent = "vous êtes réunis !";
-      el.innerHTML = '';
+      el.innerHTML = '<div style="font-size:1.5rem; color:var(--gold-soft); font-family:\'Cormorant Garamond\'">Vous êtes réunis !</div>';
       return;
     }
-    label.textContent = "avant la prochaine fois qu'on se voit";
+    
     const days = Math.floor(diff/(1000*60*60*24));
     const hours = Math.floor((diff/(1000*60*60))%24);
     const mins = Math.floor((diff/(1000*60))%60);
@@ -661,7 +683,7 @@
       book.innerHTML = `
         <div class="page cover-page">
           <div class="cover-ornament">✦</div>
-          <h2>Notre histoire</h2>
+          <h2 class="editable" data-key="coverTitle" ${window.isAdmin ? 'contenteditable="true"' : ''}>${window.siteTexts.coverTitle || 'Notre histoire'}</h2>
         </div>
       `;
       document.getElementById('pageIndicator').textContent = '';
@@ -687,7 +709,6 @@
     document.getElementById('nextBtn').disabled = window.currentPage === window.pages.length - 1;
   };
 
-  // Sécurité anti spam ajoutée ici !
   function turnPage(dir){
     if (window.isTurning) return; 
     
@@ -854,7 +875,11 @@
 
   function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 
-  // Initialisation de la page
+  // Initialisation au lancement
+  document.querySelectorAll('.editable').forEach(el => {
+    const k = el.getAttribute('data-key');
+    if(window.siteTexts[k]) el.innerText = window.siteTexts[k];
+  });
   window.renderCountdown();
   window.renderBook();
   initMap();
