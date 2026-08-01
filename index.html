@@ -304,7 +304,7 @@
 <div class="hero">
   <div class="hero-orn">✦</div>
   <!-- On ajoute class="editable" et data-key="" à TOUS les textes ! -->
-  <h1 class="editable" data-key="heroTitle">Bon anniversaire</h1>
+  <h1 class="editable" data-key="heroTitle">Joyeux anniversaire Hannahhh !</h1>
   <div class="names editable" data-key="heroSub">19 ans que tu rayonnes et que tu rends ton entourage heureux</div>
 
   <div class="countdown-wrap">
@@ -317,7 +317,7 @@
       <button class="save-mini" onclick="saveCountdown()">enregistrer</button>
     </div>
   </div>
-  <div class="scroll-hint">faites défiler ↓</div>
+  <div class="scroll-hint">regarde encore en bas ↓</div>
 </div>
 
 <div class="section" id="book-section">
@@ -341,21 +341,21 @@
 <div class="section">
   <div class="divider"></div>
   <div class="eyebrow editable" data-key="mapEyebrow">notre carte</div>
-  <h2 class="section-title editable" data-key="mapTitle">La carte de nos retrouvailles</h2>
+  <h2 class="section-title editable" data-key="mapTitle">La carte de nos dates</h2>
   <div id="map"></div>
   
-  <div class="map-hint editable" data-key="mapHint">Cliquez n'importe où sur la carte pour ajouter un lieu, une date et une anecdote.</div>
+  <div class="map-hint editable" data-key="mapHint">Clique n'importe où sur la carte pour ajouter un point</div>
 </div>
 
 <footer>
-  <span class="serif editable" data-key="footerText1">À nous, pour toujours (et c'est moi qui t'aime +)</span>
+  <span class="serif editable" data-key="footerText1">J'espère que ça te fera plaisir, en attendant de fêter ça les deux !</span>
   <span class="editable" data-key="footerText2" style="display:block;">JE T'AIME, aurel</span>
 
   <!-- SECTION LETTRE D'AMOUR (la seule qui reste un bouton car le texte est trop long pour être édité directement sur la page) -->
   <div class="love-letter-wrap">
     <div id="loveLetterDisplay" class="love-letter-text"></div>
     <div class="admin-only admin-block" style="margin-top: 1rem;">
-      <button class="edit-btn" onclick="openLetterModal()">modifier la lettre d'amour longue</button>
+      <button class="edit-btn" onclick="openLetterModal()">modifier la lettre d'amour</button>
     </div>
   </div>
 </footer>
@@ -363,17 +363,17 @@
 <!-- SECTION ADMIN SECRÈTE EN BAS -->
 <div class="section" style="padding-top: 0; padding-bottom: 4rem;">
   <div class="divider" style="margin-bottom: 1.5rem;"></div>
-  <div class="eyebrow">Accès Réservé</div>
+  <div class="eyebrow">modification</div>
   
   <div id="adminLogin" style="text-align:center; margin-top:1rem;">
     <input type="password" id="adminPwd" placeholder="Mot de passe" style="background:var(--bg-panel); border:1px solid var(--line); color:var(--cream); padding:.5rem .8rem; border-radius:6px; font-family:'Work Sans'; width:200px; margin-right:0.5rem; margin-bottom:0.5rem;">
-    <button class="save-mini" onclick="unlockAdmin()">Mode Édition</button>
+    <button class="save-mini" onclick="unlockAdmin()">Mode admin</button>
     <div id="adminError" class="lock-error"></div>
   </div>
   
   <div id="adminPanel" style="display:none; text-align:center; color:var(--gold-soft); font-size:0.85rem; padding: 1rem; border: 1px dashed var(--line); border-radius: 8px;">
     ✓ <b>Mode Administrateur activé.</b><br>
-    <span style="color:var(--cream);">✨ Tu peux maintenant cliquer directement sur n'importe quel texte de la page (titres, phrases) pour le modifier ! Ça s'enregistre tout seul quand tu cliques ailleurs.</span>
+    <span style="color:var(--cream);"> Modifications activés et enregistrées automatiquement</span>
   </div>
 </div>
 
@@ -449,9 +449,9 @@
 
 <div class="modal-overlay" id="letterModal">
   <div class="modal" style="max-width: 600px;">
-    <h3>Ta lettre d'amour</h3>
+    <h3>lettre d'amour</h3>
     <div class="field">
-      <label>Ton texte long (les retours à la ligne seront conservés)</label>
+      <label>Texte (les retours à la ligne seront conservés)</label>
       <textarea id="letterInput" placeholder="Écris ici..." style="min-height: 250px;"></textarea>
     </div>
     <div class="modal-actions">
@@ -537,7 +537,7 @@
 </script>
 
 <script>
-  const ADMIN_PASSWORD = "notrehistoire";
+  const ADMIN_PASSWORD = "mimi0808";
 
   // TES TEXTES PAR DÉFAUT
   window.siteTexts = {
