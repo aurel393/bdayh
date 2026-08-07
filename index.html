@@ -194,7 +194,6 @@
     border-radius:4px; 
     box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
   }
-  /* ------------------------------------------- */
 
   .page-empty{
     display:flex; align-items:center; justify-content:center; height:100%; flex-direction:column; gap:.8rem;
@@ -206,6 +205,24 @@
   }
   .page-date{ font-size:.75rem; color: #a5334a; font-family:'Work Sans'; letter-spacing:.08em; margin-top:.4rem; font-weight:500;}
   
+  /* --- ADAPTATION MOBILE (POUR AFFICHER LES PHOTOS VERTICALES EN GRAND) --- */
+  @media (max-width: 600px) {
+    .book {
+      aspect-ratio: 3/4; /* Le livre passe en format vertical (portrait) sur téléphone ! */
+    }
+    .page-photo {
+      padding: 1rem 1rem 0.2rem 2.2rem; /* Marges réduites pour que l'image prenne plus de place */
+    }
+    .page-caption {
+      padding: 0.5rem 1rem 1rem 2.2rem;
+      font-size: 1.15rem;
+      min-height: 3rem;
+    }
+    .page-empty {
+      padding: 1.5rem 1rem 1.5rem 2.2rem;
+    }
+  }
+
   .page-del{ position:absolute; top:1rem; right:1rem; background:rgba(255,255,255,.9); border:1px solid #d4c4b7; color: #a5334a; font-size:.65rem; padding:.3rem .6rem; border-radius:12px; cursor:pointer; z-index:10; font-family:'Work Sans'; }
   .page-del:hover { background: #fff; border-color: #a5334a; }
   
@@ -303,7 +320,6 @@
 
 <div class="hero">
   <div class="hero-orn">✦</div>
-  <!-- On ajoute class="editable" et data-key="" à TOUS les textes ! -->
   <h1 class="editable" data-key="heroTitle">Joyeux anniversaire Hannahhh !</h1>
   <div class="names editable" data-key="heroSub">19 ans que tu rayonnes et que tu rends ton entourage heureux</div>
 
@@ -351,7 +367,6 @@
   <span class="serif editable" data-key="footerText1">J'espère que ça te fera plaisir, en attendant de fêter ça les deux !</span>
   <span class="editable" data-key="footerText2" style="display:block;">JE T'AIME, aurel</span>
 
-  <!-- SECTION LETTRE D'AMOUR (la seule qui reste un bouton car le texte est trop long pour être édité directement sur la page) -->
   <div class="love-letter-wrap">
     <div id="loveLetterDisplay" class="love-letter-text"></div>
     <div class="admin-only admin-block" style="margin-top: 1rem;">
@@ -360,7 +375,6 @@
   </div>
 </footer>
 
-<!-- SECTION ADMIN SECRÈTE EN BAS -->
 <div class="section" style="padding-top: 0; padding-bottom: 4rem;">
   <div class="divider" style="margin-bottom: 1.5rem;"></div>
   <div class="eyebrow">modification</div>
@@ -541,16 +555,16 @@
 
   // TES TEXTES PAR DÉFAUT
   window.siteTexts = {
-    heroTitle: "Joyeux anniversaire Hannahhh!",
-    heroSub: "19 ans",
+    heroTitle: "Joyeux anniversaire Hannahhh !",
+    heroSub: "19 ans que tu rayonnes et que tu rends ton entourage heureux",
     cdLabel: "avant la prochaine fois qu'on se voit",
     bookEyebrow: "notre livre",
     bookTitle: "Nos souvenirs comme dans un livre",
     coverTitle: "Our story",
     mapEyebrow: "notre carte",
     mapTitle: "La carte de nos dates",
-    mapHint: "Cliquez n'importe où sur la carte pour ajouter un point",
-    footerText1: "À nous, pour toujours (et c'est moi qui t'aime +)",
+    mapHint: "Clique n'importe où sur la carte pour ajouter un point",
+    footerText1: "J'espère que ça te fera plaisir, en attendant de fêter ça les deux !",
     footerText2: "JE T'AIME, aurel"
   };
 
